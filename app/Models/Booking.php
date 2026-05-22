@@ -2,9 +2,52 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Booking extends Model
 {
-    //
+    use HasFactory;
+
+    protected $fillable = [
+        'service_id',
+        'user_id',
+        'customer_name',
+        'customer_email',
+        'customer_phone',
+        'booking_date',
+        'booking_time',
+        'status',
+        'total_price',
+    ];
+
+    protected $casts = [
+        'booking_date' => 'date',
+        'booking_time' => 'datetime:H:i:s',
+    ];
+
+    // Booking code generator
+    protected static function booted()
+    {
+        static::creating(function ($booking) {
+            $booking->booking_code = 'BK-'.date('Ymd').strtoupper(Str::random(6));
+        });
+    }
+
+    /**
+     * Get the service that belongs to the booking.
+     */
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(Service::class);
+    }
+
+    /**
+     * Get the registered user who made this booking.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }
