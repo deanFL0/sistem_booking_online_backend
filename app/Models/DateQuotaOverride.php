@@ -10,6 +10,7 @@ class DateQuotaOverride extends Model
     use HasFactory;
 
     protected $fillable = [
+        'service_id',
         'override_date',
         'start_time',
         'end_time',
@@ -22,4 +23,9 @@ class DateQuotaOverride extends Model
         'start_time' => 'datetime:H:i:s',
         'end_time' => 'datetime:H:i:s',
     ];
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
+    }
 }

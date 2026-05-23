@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('hourly_quotas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('service_id')->constrained()->onDelete('cascade');
             $table->tinyInteger('day_of_week')->unsigned(); // 0 (Sunday) to 6 (Saturday)
             $table->time('start_time');
             $table->time('end_time');

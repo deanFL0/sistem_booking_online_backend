@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->decimal('price', 9, 2)->default(0);
-            $table->integer('duration')->default(0); // Duration in minutes
+            $table->enum('pricing_type', ['one_time', 'hourly'])->default('hourly'); // Pricing model
+            $table->integer('duration')->default(0); // Estimated duration in minutes
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

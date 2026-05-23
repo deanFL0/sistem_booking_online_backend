@@ -10,6 +10,7 @@ class HourlyQuota extends Model
     use HasFactory;
 
     protected $fillable = [
+        'service_id',
         'day_of_week',
         'start_time',
         'end_time',
@@ -20,4 +21,9 @@ class HourlyQuota extends Model
         'start_time' => 'datetime:H:i:s',
         'end_time' => 'datetime:H:i:s',
     ];
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
+    }
 }

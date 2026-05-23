@@ -13,6 +13,7 @@ class Service extends Model
         'name',
         'description',
         'price',
+        'pricing_type',
         'duration',
         'is_active',
     ];
@@ -25,5 +26,15 @@ class Service extends Model
     public function operationalHours()
     {
         return $this->hasMany(OperationalHour::class);
+    }
+
+    public function hourlyQuotas()
+    {
+        return $this->hasMany(HourlyQuota::class);
+    }
+
+    public function dateQuotaOverrides()
+    {
+        return $this->hasMany(DateQuotaOverride::class);
     }
 }

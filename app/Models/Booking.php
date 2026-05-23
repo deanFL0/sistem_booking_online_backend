@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class Booking extends Model
 {
@@ -18,6 +19,8 @@ class Booking extends Model
         'customer_phone',
         'booking_date',
         'booking_time',
+        'duration_minutes',
+        'booking_end_time',
         'status',
         'total_price',
     ];
@@ -25,6 +28,7 @@ class Booking extends Model
     protected $casts = [
         'booking_date' => 'date',
         'booking_time' => 'datetime:H:i:s',
+        'booking_end_time' => 'datetime:H:i:s',
     ];
 
     // Booking code generator

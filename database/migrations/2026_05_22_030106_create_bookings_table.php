@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('customer_phone');
             $table->date('booking_date');
             $table->time('booking_time');
+            $table->integer('duration_minutes')->default(0); // Actual/confirmed duration in minutes
+            $table->time('booking_end_time')->nullable(); // Calculated end time
             $table->enum('status', ['pending', 'confirmed', 'cancelled', 'completed'])->default('pending');
             $table->decimal('total_price', 9, 2);
             $table->timestamps();

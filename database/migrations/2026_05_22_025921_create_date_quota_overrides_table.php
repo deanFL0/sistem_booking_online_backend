@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('date_quota_overrides', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('service_id')->constrained()->onDelete('cascade');
             $table->date('override_date');
             $table->time('start_time');
             $table->time('end_time');
