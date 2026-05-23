@@ -12,8 +12,9 @@ class Booking extends Model
     use HasFactory;
 
     protected $fillable = [
-        'service_id',
         'user_id',
+        'service_id',
+        'resource_id',
         'customer_name',
         'customer_email',
         'customer_phone',
@@ -53,5 +54,13 @@ class Booking extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the resource (barber, chair, etc.) assigned to this booking.
+     */
+    public function resource(): BelongsTo
+    {
+        return $this->belongsTo(Resource::class);
     }
 }

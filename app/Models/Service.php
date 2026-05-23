@@ -22,19 +22,4 @@ class Service extends Model
     {
         return $this->hasMany(Booking::class);
     }
-
-    public function operationalHours()
-    {
-        return $this->hasMany(OperationalHour::class);
-    }
-
-    public function hourlyQuotas()
-    {
-        return $this->hasMany(HourlyQuota::class);
-    }
-
-    public function dateQuotaOverrides()
-    {
-        return $this->hasMany(DateQuotaOverride::class);
-    }
 }

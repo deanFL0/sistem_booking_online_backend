@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('date_quota_overrides', function (Blueprint $table) {
+        Schema::create('override_resource_availabilities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_id')->constrained()->onDelete('cascade');
-            $table->date('override_date');
+            $table->foreignId('resource_id')->constrained('resources')->onDelete('cascade');
+            $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
-            $table->integer('custom_quota')->default(1);
-            $table->boolean('is_closed')->default(false);
+            $table->enum('status', ['available', 'unavailable'])->default('unavailable');
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('date_quota_overrides');
+        Schema::dropIfExists('override_resource_availabilities');
     }
 };

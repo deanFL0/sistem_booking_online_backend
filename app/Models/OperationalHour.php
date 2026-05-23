@@ -21,4 +21,9 @@ class OperationalHour extends Model
     {
         return $this->belongsTo(Service::class);
     }
+
+    public function resource()
+    {
+        return $this->belongsTo(Resource::class);
+    }
 }

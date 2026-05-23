@@ -2,16 +2,16 @@
 
 namespace Database\Factories;
 
-use App\Models\HourlyQuota;
-use App\Models\Service;
+use App\Models\OverrideResourceAvailability;
+use App\Models\Resource;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<HourlyQuota>
+ * @extends Factory<OverrideResourceAvailability>
  */
-class HourlyQuotaFactory extends Factory
+class OverrideResourceAvailabilityFactory extends Factory
 {
-    protected $model = HourlyQuota::class;
+    protected $model = OverrideResourceAvailability::class;
 
     /**
      * Define the model's default state.
@@ -22,11 +22,11 @@ class HourlyQuotaFactory extends Factory
         $endHour = $this->faker->numberBetween($startHour + 1, 18);
 
         return [
-            'service_id' => Service::factory(),
-            'day_of_week' => $this->faker->numberBetween(0, 6),
+            'resource_id' => Resource::factory(),
+            'date' => $this->faker->dateTimeBetween('+1 day', '+30 days')->format('Y-m-d'),
             'start_time' => sprintf('%02d:00:00', $startHour),
             'end_time' => sprintf('%02d:00:00', $endHour),
-            'default_quota' => $this->faker->numberBetween(1, 5), // 1-5 concurrent bookings allowed
+            'status' => $this->faker->randomElement(['available', 'unavailable']),
         ];
     }
 }

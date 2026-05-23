@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('operational_hours', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_id')->constrained()->onDelete('cascade');
+            $table->foreignId('resource_id')->constrained()->onDelete('cascade');
             $table->tinyInteger('day_of_week')->unsigned(); // 0 (Sunday) to 6 (Saturday)
             $table->time('open_time');
             $table->time('close_time');

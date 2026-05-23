@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('booking_code')->unique();
             $table->foreignId('service_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null'); // for logged in user
+            $table->foreignId('resource_id')->nullable()->constrained('resources')->onDelete('set null'); // assigned resource (barber, chair, etc.)
             $table->string('customer_name');
             $table->string('customer_email');
             $table->string('customer_phone');

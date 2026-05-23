@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Booking;
 use App\Models\Service;
 use App\Models\User;
+use App\Models\Resource;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,15 +20,15 @@ class BookingFactory extends Factory
      */
     public function definition(): array
     {
-        $service = Service::factory();
         $bookingTime = $this->faker->time('H:i:s');
         $durationMinutes = $this->faker->numberBetween(30, 180);
         $bookingDateTime = \DateTime::createFromFormat('H:i:s', $bookingTime);
         $bookingEndDateTime = (clone $bookingDateTime)->add(new \DateInterval('PT' . $durationMinutes . 'M'));
         
         return [
-            'service_id' => $service,
             'user_id' => User::factory(),
+            'service_id' => Service::factory(),
+            'resource_id' => Resource::factory(),
             'customer_name' => $this->faker->name,
             'customer_email' => $this->faker->unique()->safeEmail,
             'customer_phone' => $this->faker->phoneNumber,

@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('hourly_quotas', function (Blueprint $table) {
+        Schema::create('resources', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_id')->constrained()->onDelete('cascade');
-            $table->tinyInteger('day_of_week')->unsigned(); // 0 (Sunday) to 6 (Saturday)
-            $table->time('start_time');
-            $table->time('end_time');
-            $table->integer('default_quota')->default(1);
+            $table->string('name'); // e.g., "Barber 1", "Chair A"
+            $table->string('type'); // barber, chair, room, etc.
+            $table->text('description')->nullable();
+            $table->boolean('is_available')->default(true);
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('hourly_quotas');
+        Schema::dropIfExists('resources');
     }
 };
