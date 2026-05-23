@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name'); // e.g., "Barber 1", "Chair A"
             $table->string('type'); // barber, chair, room, etc.
             $table->text('description')->nullable();
-            $table->boolean('is_available')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

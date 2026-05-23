@@ -13,11 +13,11 @@ class Resource extends Model
         'name',
         'type',
         'description',
-        'is_available',
+        'is_active',
     ];
 
     protected $casts = [
-        'is_available' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     /**

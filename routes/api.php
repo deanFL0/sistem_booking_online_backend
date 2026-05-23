@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\ServicesController;
+use App\Http\Controllers\Api\ServiceController;
+use App\Http\Controllers\Api\ResourceController;
 
 Route::prefix('v1')->group(function () {
     // auth routes
@@ -25,12 +26,15 @@ Route::prefix('v1')->group(function () {
         Route::post('/users/{user}/restore', [UserController::class, 'restore']);
 
         // service routes
-        Route::apiResource('/services', ServicesController::class);
+        Route::apiResource('/services', ServiceController::class);
+
+        // resource routes
+        Route::apiResource('/resources', ResourceController::class);
     });
 
     // routes for user
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/services', [ServicesController::class, 'index']);
-        Route::get('/services/{service}', [ServicesController::class, 'show']);
+        Route::get('/services', [ServiceController::class, 'index']);
+        Route::get('/services/{service}', [ServiceController::class, 'show']);
     });
 });

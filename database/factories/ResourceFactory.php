@@ -21,7 +21,7 @@ class ResourceFactory extends Factory
             'name' => $this->faker->name . ' ' . $this->faker->numberBetween(1, 10),
             'type' => $this->faker->randomElement(['barber', 'chair', 'room']),
             'description' => $this->faker->sentence,
-            'is_available' => $this->faker->boolean(90), // 90% chance to be available
+            'is_active' => $this->faker->boolean(90), // 90% chance to be available
         ];
     }
 }
