@@ -24,12 +24,12 @@ class UpdateServiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            'name' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'pricing_type' => 'required|in:one_time,hourly',
-            'duration' => 'required|numeric|min:0',
-            'is_active' => 'required|boolean',
+            'price' => 'sometimes|numeric|min:0',
+            'pricing_type' => 'sometimes|in:one_time,hourly',
+            'duration' => 'sometimes|numeric|min:0',
+            'is_active' => 'sometimes|boolean',
         ];
     }
 }

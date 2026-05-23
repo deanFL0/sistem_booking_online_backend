@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreServiceRequest;
+use App\Http\Requests\UpdateServiceRequest;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use App\Http\Resources\ServiceResource;
 
 class ServicesController extends Controller
 {
@@ -13,15 +16,17 @@ class ServicesController extends Controller
      */
     public function index()
     {
-        //
+        return ServiceResource::collection(Service::paginate(25));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreServiceRequest $request)
     {
-        //
+        $service = Service::create($request->validated());
+
+        return (new ServiceResource($service))->response()->setStatusCode(201);
     }
 
     /**
@@ -29,15 +34,17 @@ class ServicesController extends Controller
      */
     public function show(Service $service)
     {
-        //
+        return new ServiceResource($service);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Service $service)
+    public function update(UpdateServiceRequest $request, Service $service)
     {
-        //
+        $service->update($request->validated());
+
+        return new ServiceResource($service);
     }
 
     /**
@@ -45,6 +52,8 @@ class ServicesController extends Controller
      */
     public function destroy(Service $service)
     {
-        //
+        $service->delete();
+
+        return response()->json(['message' => 'Service deleted successfully'], 200);
     }
 }
