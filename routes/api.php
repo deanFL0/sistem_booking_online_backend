@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\ResourceController;
+use App\Http\Controllers\Api\ProfileController;
 
 Route::prefix('v1')->group(function () {
     // auth routes
@@ -34,6 +35,14 @@ Route::prefix('v1')->group(function () {
 
     // routes for user
     Route::middleware('auth:sanctum')->group(function () {
+        // profile routes
+        Route::get('/profile', [ProfileController::class, 'me']);
+        Route::put('/profile', [ProfileController::class, 'update']);
+        Route::patch('/profile', [ProfileController::class, 'update']);
+        Route::post('/profile/reset-password', [ProfileController::class, 'resetPassword']);
+        Route::delete('/profile', [ProfileController::class, 'destroy']);
+
+        // services routes
         Route::get('/services', [ServiceController::class, 'index']);
         Route::get('/services/{service}', [ServiceController::class, 'show']);
     });
