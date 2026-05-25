@@ -71,6 +71,17 @@ class BookingController extends Controller
 
     public function reschedule(RescheduleBookingRequest $request, Booking $booking)
     {
+        // Dissallow rescheduling if the booking is already cancelled or completed
+        if (in_array($booking->status, ['cancelled', 'completed'])) {
+            return response()->json(['message' => 'Booking cannot be rescheduled'], 400);
+        }
+
+        // Dissallow rescheduling within set number of hours before the booking start time
+        $minRescheduleTime = (int) setting('minimum_reschedule', 24);
+        if ($booking->start_datetime->diffInHours(now()) < $minRescheduleTime) {
+            return response()->json(['message' => 'Booking cannot be rescheduled within ' . $minRescheduleTime . ' hours of the book time'], 400);
+        }
+
         $booking->update($request->validated());
         return new BookingResource($booking);
     }
@@ -82,8 +93,13 @@ class BookingController extends Controller
             return response()->json(['message' => 'Booking cannot be cancelled'], 400);
         }
 
-        // Dissallow cancellation within 24 hours of the booking start time
+        // Dissallow cancellation within set number of hours before the booking start time
+        $minCancellationTime = (int) setting('minimum_cancel', 24);
+        if ($booking->start_datetime->diffInHours(now()) < $minCancellationTime) {
+            return response()->json(['message' => 'Booking cannot be cancelled within ' . $minCancellationTime . ' hours of the book time'], 400);
+        }
 
+        $booking->update($request->validated());
         return new BookingResource($booking);
     }
 
