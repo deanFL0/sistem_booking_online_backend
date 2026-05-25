@@ -8,6 +8,7 @@ use App\Models\OperationalHour;
 use App\Models\Resource;
 use App\Models\ResourceAvailabilityOverride;
 use App\Models\Booking;
+use App\Models\Setting;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -50,6 +51,10 @@ class DatabaseSeeder extends Seeder
             // Create bookings
             Booking::factory(5)->create();
             
+            Setting::factory()->create([
+                'key' => 'min_cancellation_hours',
+                'value' => '24',
+            ]);
         });
     }
 }
