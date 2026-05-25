@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreOperationalHourRequiest;
+use App\Http\Requests\StoreOperationalHourRequest;
 use App\Http\Requests\UpdateOperationalHourRequest;
 use App\Http\Resources\OperationalHourResource;
 use App\Models\OperationalHour;
@@ -31,7 +31,7 @@ class OperationalHourController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreOperationalHourRequiest $request, Resource $resource)
+    public function store(StoreOperationalHourRequest $request, Resource $resource)
     {
         $operationalHour = $resource->operationalHours()->create($request->validated());
 

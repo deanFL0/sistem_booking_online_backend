@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreOperationalHourRequiest extends FormRequest
+class StoreResourceAvailabilityOverrideRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,10 +24,11 @@ class StoreOperationalHourRequiest extends FormRequest
     public function rules(): array
     {
         return [
-            'day_of_week'=>'required|integer|min:0|max:6',
-            'open_time'=>'required|date_format:H:i',
-            'close_time'=>'required|date_format:H:i|after:open_time',
-            'is_closed'=>'boolean',
+            'resource_id'=>'required|exists:resources,id',
+            'date'=>'required|date',
+            'start_time'=>'required|date_format:H:i',
+            'end_time'=>'required|date_format:H:i|after:start_time',
+            'status'=>'required|in:available,unavailable',
         ];
     }
 }

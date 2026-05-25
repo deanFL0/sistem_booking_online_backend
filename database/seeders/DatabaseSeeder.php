@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\Service;
 use App\Models\OperationalHour;
 use App\Models\Resource;
-use App\Models\OverrideResourceAvailability;
+use App\Models\ResourceAvailabilityOverride;
 use App\Models\Booking;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -45,7 +45,7 @@ class DatabaseSeeder extends Seeder
             }
 
             // Create some resource availability overrides
-            OverrideResourceAvailability::factory(3)->create();
+            ResourceAvailabilityOverride::factory(3)->create();
 
             // Create bookings
             Booking::factory(5)->create();

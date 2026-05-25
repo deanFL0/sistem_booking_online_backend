@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class OverrideResourceAvailability extends Model
+class ResourceAvailabilityOverride extends Model
 {
     use HasFactory;
 
+    protected $table = 'resource_availability_overrides';
+    
     protected $fillable = [
         'resource_id',
         'date',

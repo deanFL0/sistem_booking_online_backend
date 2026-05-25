@@ -2,16 +2,16 @@
 
 namespace Database\Factories;
 
-use App\Models\OverrideResourceAvailability;
+use App\Models\ResourceAvailabilityOverride;
 use App\Models\Resource;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<OverrideResourceAvailability>
+ * @extends Factory<ResourceAvailabilityOverride>
  */
-class OverrideResourceAvailabilityFactory extends Factory
+class ResourceAvailabilityOverrideFactory extends Factory
 {
-    protected $model = OverrideResourceAvailability::class;
+    protected $model = ResourceAvailabilityOverride::class;
 
     /**
      * Define the model's default state.

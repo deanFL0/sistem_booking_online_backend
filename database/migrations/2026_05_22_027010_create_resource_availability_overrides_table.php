@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('override_resource_availabilities', function (Blueprint $table) {
+        Schema::create('resource_availability_overrides', function (Blueprint $table) {
             $table->id();
             $table->foreignId('resource_id')->constrained('resources')->onDelete('cascade');
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
-            $table->enum('status', ['available', 'unavailable'])->default('unavailable');
+            $table->enum('status', ['available', 'unavailable']);
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('override_resource_availabilities');
+        Schema::dropIfExists('resource_availability_overrides');
     }
 };

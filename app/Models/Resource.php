@@ -35,6 +35,6 @@ class Resource extends Model
 
     public function overrideAvailabilities()
     {
-        return $this->hasMany(OverrideResourceAvailability::class);
+        return $this->hasMany(ResourceAvailabilityOverride::class);
     }
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\ResourceController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\ResourceAvailabilityOverrideController;
 
 Route::prefix('v1')->group(function () {
     // auth routes
@@ -40,6 +41,12 @@ Route::prefix('v1')->group(function () {
                 'operational-hours' => 'operationalHour'
             ]);
         });
+
+        // resource availability override routes
+        Route::apiResource('/availability-overrides', ResourceAvailabilityOverrideController::class)
+        ->parameters([
+            'availability-overrides' => 'resourceAvailabilityOverride'
+        ]);
     });
 
     // routes for user
