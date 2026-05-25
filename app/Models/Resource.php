@@ -33,7 +33,7 @@ class Resource extends Model
         return $this->hasMany(OperationalHour::class);
     }
 
-    public function overrideAvailabilities()
+    public function availabilityOverrides()
     {
         return $this->hasMany(ResourceAvailabilityOverride::class);
     }
