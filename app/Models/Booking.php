@@ -18,18 +18,17 @@ class Booking extends Model
         'customer_name',
         'customer_email',
         'customer_phone',
-        'booking_date',
-        'booking_time',
+        'start_datetime',
+        'end_datetime',
         'duration_minutes',
-        'booking_end_time',
         'status',
         'total_price',
     ];
 
     protected $casts = [
-        'booking_date' => 'date',
-        'booking_time' => 'datetime:H:i:s',
-        'booking_end_time' => 'datetime:H:i:s',
+        'start_datetime' => 'datetime',
+        'end_datetime' => 'datetime',
+        'duration_minutes' => 'integer',
     ];
 
     // Booking code generator

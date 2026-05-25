@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\OperationalHourController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ServiceController;
@@ -47,6 +48,9 @@ Route::prefix('v1')->group(function () {
         ->parameters([
             'availability-overrides' => 'resourceAvailabilityOverride'
         ]);
+
+        // bookings routes
+        Route::apiResource('/bookings', BookingController::class);
     });
 
     // routes for user
@@ -61,5 +65,11 @@ Route::prefix('v1')->group(function () {
         // services routes
         Route::get('/services', [ServiceController::class, 'index']);
         Route::get('/services/{service}', [ServiceController::class, 'show']);
+
+        // Bookings routes
+        Route::post('/bookings', [BookingController::class, 'store']);
+        Route::get('/my-bookings', [BookingController::class, 'myBookings']);
+        Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
+        Route::patch('/bookings/{booking}/reschedule', [BookingController::class, 'reschedule']);
     });
 });
