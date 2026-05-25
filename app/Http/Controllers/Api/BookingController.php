@@ -49,6 +49,7 @@ class BookingController extends Controller
      */
     public function show(Booking $booking)
     {
+        $this->authorize('view', $booking);
         return new BookingResource($booking);
     }
 
