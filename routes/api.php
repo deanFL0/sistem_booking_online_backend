@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\OperationalHourController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\ResourceController;
@@ -31,6 +32,14 @@ Route::prefix('v1')->group(function () {
 
         // resource routes
         Route::apiResource('/resources', ResourceController::class);
+
+        // operational hour routes
+        Route::scopeBindings()->group(function () {
+            Route::apiResource('resources.operational-hours', OperationalHourController::class)
+            ->parameters([
+                'operational-hours' => 'operationalHour'
+            ]);
+        });
     });
 
     // routes for user

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -18,7 +18,7 @@ class ProfileController extends Controller
         return new ProfileResource(auth()->user());
     }
 
-    public function update(ProfileUpdateRequest $request)
+    public function update(UpdateProfileRequest $request)
     {
         $user = auth()->user();
         $user->update($request->validated());
