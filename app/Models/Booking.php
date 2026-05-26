@@ -14,7 +14,6 @@ class Booking extends Model
     protected $fillable = [
         'user_id',
         'service_id',
-        'resource_id',
         'customer_name',
         'customer_email',
         'customer_phone',

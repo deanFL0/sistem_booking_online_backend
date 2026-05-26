@@ -25,7 +25,6 @@ class AdminUpdateBookingRequest  extends FormRequest
         return [
             'user_id' => 'sometimes|exists:users,id',
             'service_id' => 'sometimes|exists:services,id',
-            'resource_id' => 'sometimes|exists:resources,id',
             'customer_name' => 'sometimes|string|max:255',
             'customer_email' => 'sometimes|email|max:255',
             'customer_phone' => 'sometimes|string|max:20',

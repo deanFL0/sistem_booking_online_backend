@@ -28,7 +28,6 @@ class BookingFactory extends Factory
         return [
             'user_id' => User::factory(),
             'service_id' => Service::factory(),
-            'resource_id' => Resource::factory(),
             'customer_name' => $this->faker->name,
             'customer_email' => $this->faker->unique()->safeEmail,
             'customer_phone' => $this->faker->phoneNumber,
