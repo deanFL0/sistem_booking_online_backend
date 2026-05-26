@@ -11,7 +11,7 @@ class Resource extends Model
 
     protected $fillable = [
         'name',
-        'type',
+        'resource_type_id',
         'description',
         'is_active',
     ];
@@ -38,8 +38,8 @@ class Resource extends Model
         return $this->hasMany(ResourceAvailabilityOverride::class);
     }
 
-    public function services()
+    public function resourceType()
     {
-        return $this->belongsToMany(Service::class);
+        return $this->belongsTo(ResourceType::class);
     }
 }

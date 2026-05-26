@@ -11,20 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('resource_service', function (Blueprint $table) {
+        Schema::create('resource_types', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('resource_id')
-                ->constrained()
-                ->onDelete('cascade');
-
-            $table->foreignId('service_id')
-                ->constrained()
-                ->onDelete('cascade');
-
+            $table->string('name')->unique();
+            $table->text('description')->nullable();
             $table->timestamps();
-
-            $table->unique(['resource_id', 'service_id']);
         });
     }
 
@@ -33,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('resource_service');
+        Schema::dropIfExists('resource_types');
     }
 };

@@ -8,6 +8,7 @@ use App\Models\OperationalHour;
 use App\Models\Resource;
 use App\Models\ResourceAvailabilityOverride;
 use App\Models\Booking;
+use App\Models\ResourceType;
 use App\Models\Setting;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -32,11 +33,24 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('admin123'),
         ]);
 
-        // Create 3 resources (barbers)
+        // Create 3 services
         Service::factory(3)->create();
 
-        // Create 5 services with their related data
-        Resource::factory(5)->create()->each(function ($resource) {
+        // Create 3 resource types
+        $resourceTypes = ResourceType::factory(3)->create();
+
+        // Link services to resource types
+        Service::all()->each(function ($service) use ($resourceTypes) {
+            $resourceTypes->random(2)->each(function ($resourceType) use ($service) {
+                $resourceType->services()->attach($service->id, ['quantity' => rand(1, 3)]);
+            });
+        });
+
+        // Create 10 resources linked to resource types with operational hours
+        Resource::factory(10)->create()->each(function ($resource) {
+            // Assign a random resource type
+            $resource->update(['resource_type_id' => ResourceType::inRandomOrder()->first()->id]);
+            
             // Create operational hours for each day of the week
             for ($day = 0; $day < 7; $day++) {
                 OperationalHour::factory()->create([
@@ -48,12 +62,7 @@ class DatabaseSeeder extends Seeder
 
         // Create some resource availability overrides
         ResourceAvailabilityOverride::factory(3)->create();
-
-        // Attach services to resources
-        $serviceId = Service::first()->id;
-        $resource = Resource::first();
-        $resource->services()->attach($serviceId);
-
+        
         // Create bookings
         Booking::factory(5)->create();
         

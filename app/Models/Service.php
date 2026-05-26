@@ -23,8 +23,8 @@ class Service extends Model
         return $this->hasMany(Booking::class);
     }
 
-    public function resources()
+    public function resourceTypes()
     {
-        return $this->belongsToMany(Resource::class);
+        return $this->belongsToMany(ResourceType::class)->withPivot('quantity');
     }
 }

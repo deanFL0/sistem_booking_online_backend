@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('resources', function (Blueprint $table) {
+        Schema::create('resource_type_service', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // e.g., "Barber 1", "Chair A"
+            $table->foreignId('service_id')->constrained()->onDelete('cascade');
             $table->foreignId('resource_type_id')->constrained()->onDelete('cascade');
-            $table->text('description')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->integer('quantity')->default(1);
             $table->timestamps();
-        });
+        });     
     }
 
     /**
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('resources');
+        Schema::dropIfExists('resource_type_service');
     }
 };
