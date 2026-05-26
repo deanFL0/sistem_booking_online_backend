@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Resource;
 use App\Models\Service;
 use Illuminate\Validation\ValidationException;
+use App\Services\ResourceAvailabilityService;
 
 class BookingAvailabilityService
 {
@@ -17,7 +18,7 @@ class BookingAvailabilityService
      * @param \DateTime $end
      * @return bool
      */
-    public function isAvailable(int $serviceId, ?int $resourceId, \DateTime $start, \DateTime $end): bool
+    public function isBookingAvailable(int $serviceId, ?int $resourceId, \DateTime $start, \DateTime $end): bool
     {
         // This method would contain logic to validate if the given time slot is available for the specified service and resource.
 
@@ -32,6 +33,12 @@ class BookingAvailabilityService
         }
 
         // Check resource availability
+        $resourceAvailabilityService = new ResourceAvailabilityService();
+        if (!$resourceAvailabilityService->isResourceAvailable($resourceId, $start, $end)) {
+            throw ValidationException::withMessages([
+                'resource' => 'Resource for the service is not available for the specified time slot.',
+            ]);
+        }
 
         return true;
     }
