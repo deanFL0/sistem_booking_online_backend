@@ -9,22 +9,22 @@ use App\Services\ResourceAvailabilityService;
 
 class BookingAvailabilityService
 {
+    protected ResourceAvailabilityService $resourceAvailabilityService;
+
     /**
      * Check if a given time slot is available for booking.
      *
      * @param int $serviceId
-     * @param int $resourceId
      * @param \DateTime $start
      * @param \DateTime $end
      * @return bool
      */
-    public function isBookingAvailable(int $serviceId, int $resourceId, \DateTime $start, \DateTime $end): bool
+    public function isBookingAvailable(int $serviceId, \DateTime $start, \DateTime $end): bool
     {
         // This method would contain logic to validate if the given time slot is available for the specified service and resource.
 
+        // Get service
         $service = Service::findOrFail($serviceId);
-        $resource = Resource::findOrFail($resourceId);
-
         // Check if service is active
         if (!$service->is_active) {
             throw ValidationException::withMessages([
@@ -33,11 +33,36 @@ class BookingAvailabilityService
         }
 
         // Check resource availability
-        $resourceAvailabilityService = new ResourceAvailabilityService();
-        if (!$resourceAvailabilityService->isResourceAvailable($resourceId, $start, $end)) {
+        // Get required resource types for the service
+        $requiredResourceTypes = $service->resourceTypes;
+        if ($requiredResourceTypes->isEmpty()) {
             throw ValidationException::withMessages([
-                'resource' => 'Resource for the service is not available for the specified time slot.',
+                'service' => 'No resources requirement configured for the selected service.',
             ]);
+        }
+
+        $allocatedResources = collect();
+
+        foreach ($requiredResourceTypes as $resourceType) {
+            $quantityNeeded = $resourceType->pivot->quantity;
+
+            // Get available resources of this type for the given time slot
+            $availableResources = Resource::where('resource_type_id', $resourceType->id)
+                ->where('is_active', true)
+                ->get()
+                ->filter(function ($resource) use ($start, $end) {
+                    return $this->resourceAvailabilityService->isResourceAvailable($resource->id, $start, $end);
+                });
+
+            // Check if we have enough available resources
+            if ($availableResources->count() < $quantityNeeded) {
+                throw ValidationException::withMessages([
+                    'resource' => "Not enough available resources of type {$resourceType->name} for the selected time slot.",
+                ]);
+            }
+
+            // Allocate resources
+            $allocatedResources = $allocatedResources->merge($availableResources->take($quantityNeeded));
         }
 
         return true;
