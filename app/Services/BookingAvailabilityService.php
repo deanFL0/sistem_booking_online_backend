@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\Resource;
 use App\Models\Service;
+use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
-use App\Services\ResourceAvailabilityService;
 
 class BookingAvailabilityService
 {
@@ -18,20 +18,15 @@ class BookingAvailabilityService
 
     /**
      * Check if a given time slot is available for booking.
-     *
-     * @param int $serviceId
-     * @param \Carbon\Carbon $start
-     * @param \Carbon\Carbon $end
-     * @return bool
      */
-    public function isBookingAvailable(int $serviceId, \Carbon\Carbon $start, \Carbon\Carbon $end): bool
+    public function isBookingAvailable(int $serviceId, Carbon $start, Carbon $end)
     {
         // This method would contain logic to validate if the given time slot is available for the specified service and resource.
 
         // Get service
         $service = Service::findOrFail($serviceId);
         // Check if service is active
-        if (!$service->is_active) {
+        if (! $service->is_active) {
             throw ValidationException::withMessages([
                 'service' => 'The selected service is currently unavailable.',
             ]);
@@ -52,12 +47,27 @@ class BookingAvailabilityService
             $quantityNeeded = $resourceType->pivot->quantity;
 
             // Get available resources of this type for the given time slot
-            $availableResources = Resource::where('resource_type_id', $resourceType->id)
-                ->where('is_active', true)
-                ->get()
-                ->filter(function ($resource) use ($start, $end) {
-                    return $this->resourceAvailabilityService->isResourceAvailable($resource->id, $start, $end);
-                });
+            $availableResources = collect();
+
+            $candidateResources = Resource::where(
+                'resource_type_id', $resourceType->id
+            )->where('is_active', true)
+                ->get();
+
+            foreach ($candidateResources as $resource) {
+                try {
+                    $this->resourceAvailabilityService
+                        ->isResourceAvailable(
+                            $resource->id,
+                            $start,
+                            $end
+                        );
+                    $availableResources->push($resource);
+                } catch (ValidationException $e) {
+                    // Resource is not available, skip to next
+                    continue;
+                }
+            }
 
             // Check if we have enough available resources
             if ($availableResources->count() < $quantityNeeded) {
@@ -70,6 +80,6 @@ class BookingAvailabilityService
             $allocatedResources = $allocatedResources->merge($availableResources->take($quantityNeeded));
         }
 
-        return true;
+        return $allocatedResources;
     }
 }

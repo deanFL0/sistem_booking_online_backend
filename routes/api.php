@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
@@ -12,7 +11,6 @@ use App\Http\Controllers\Api\ResourceController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ResourceAvailabilityOverrideController;
 use App\Http\Controllers\Api\ResourceTypeController;
-use App\Http\Controllers\Api\ServiceResourceController;
 use App\Http\Controllers\Api\ServiceResourceTypeController;
 
 Route::prefix('v1')->group(function () {
@@ -77,8 +75,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/services/{service}', [ServiceController::class, 'show']);
 
         // Bookings routes
-        Route::post('/bookings', [BookingController::class, 'store']);
         Route::get('/my-bookings', [BookingController::class, 'myBookings']);
+        Route::get('/my-bookings/{booking}', [BookingController::class, 'show']);
+        Route::post('/bookings', [BookingController::class, 'store']);
         Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
         Route::patch('/bookings/{booking}/reschedule', [BookingController::class, 'reschedule']);
     });

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 class Booking extends Model
@@ -57,8 +58,8 @@ class Booking extends Model
     /**
      * Get the resource (barber, chair, etc.) assigned to this booking.
      */
-    public function resource(): BelongsTo
+    public function resource(): BelongsToMany
     {
-        return $this->belongsTo(Resource::class);
+        return $this->belongsToMany(Resource::class);
     }
 }

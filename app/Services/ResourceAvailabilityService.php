@@ -10,11 +10,6 @@ class ResourceAvailabilityService
 {
     /**
      * Check if resource is available for the given time slot.
-     *
-     * @param int $resourceId
-     * @param \Carbon\Carbon $start
-     * @param \Carbon\Carbon $end
-     * @return bool
      */
     public function isResourceAvailable(
         int $resourceId,
@@ -33,7 +28,7 @@ class ResourceAvailabilityService
         if (! $resource->is_active) {
             throw ValidationException::withMessages([
                 'resource' => [
-                    'The selected resource is unavailable.'
+                    'The selected resource is unavailable.',
                 ],
             ]);
         }
@@ -53,8 +48,8 @@ class ResourceAvailabilityService
 
         $overrides = $resource
             ->availabilityOverrides()
-            ->where('start_datetime', '<', $end)
-            ->where('end_datetime', '>', $start)
+            ->where('start_time', '<', $end)
+            ->where('end_time', '>', $start)
             ->get();
 
         /*
@@ -71,7 +66,7 @@ class ResourceAvailabilityService
         if ($hasUnavailableOverride) {
             throw ValidationException::withMessages([
                 'resource' => [
-                    'The selected resource is unavailable during this time slot.'
+                    'The selected resource is unavailable during this time slot.',
                 ],
             ]);
         }
@@ -106,7 +101,7 @@ class ResourceAvailabilityService
             if (! $operationalHour) {
                 throw ValidationException::withMessages([
                     'resource' => [
-                        'The resource is unavailable on this day.'
+                        'The resource is unavailable on this day.',
                     ],
                 ]);
             }
@@ -114,19 +109,19 @@ class ResourceAvailabilityService
             if ($operationalHour->is_closed) {
                 throw ValidationException::withMessages([
                     'resource' => [
-                        'The resource is unavailable on this day.'
+                        'The resource is unavailable on this day.',
                     ],
                 ]);
             }
 
             $open = Carbon::parse(
-                $start->toDateString() . ' ' .
-                $operationalHour->open_time
+                $start->toDateString().' '.
+                $operationalHour->open_time->format('H:i:s')
             );
 
             $close = Carbon::parse(
-                $start->toDateString() . ' ' .
-                $operationalHour->close_time
+                $start->toDateString().' '.
+                $operationalHour->close_time->format('H:i:s')
             );
 
             /*
@@ -141,7 +136,7 @@ class ResourceAvailabilityService
             ) {
                 throw ValidationException::withMessages([
                     'resource' => [
-                        'The requested time slot is outside operational hours.'
+                        'The requested time slot is outside operational hours.',
                     ],
                 ]);
             }
@@ -155,18 +150,18 @@ class ResourceAvailabilityService
 
         $hasBookingConflict = $resource
             ->bookings()
-            ->whereNotIn('status', [
+            ->whereNotIn('bookings.status', [
                 'cancelled',
                 'completed',
             ])
-            ->where('start_datetime', '<', $end)
-            ->where('end_datetime', '>', $start)
+            ->where('bookings.start_datetime', '<', $end)
+            ->where('bookings.end_datetime', '>', $start)
             ->exists();
 
         if ($hasBookingConflict) {
             throw ValidationException::withMessages([
                 'resource' => [
-                    'The selected resource is already booked during this time slot.'
+                    'The selected resource is already booked during this time slot.',
                 ],
             ]);
         }

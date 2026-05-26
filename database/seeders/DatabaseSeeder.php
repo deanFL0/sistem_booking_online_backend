@@ -170,7 +170,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Haircut',
             'description' => 'Professional haircut service',
             'price' => 50000,
-            'pricing_type' => 'fixed',
+            'pricing_type' => 'one_time',
             'duration' => 30,
             'is_active' => true,
         ]);
@@ -179,7 +179,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Hair Coloring',
             'description' => 'Professional hair coloring service',
             'price' => 150000,
-            'pricing_type' => 'fixed',
+            'pricing_type' => 'hourly',
             'duration' => 90,
             'is_active' => true,
         ]);
@@ -188,7 +188,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Hair Styling',
             'description' => 'Professional hair styling service',
             'price' => 75000,
-            'pricing_type' => 'fixed',
+            'pricing_type' => 'one_time',
             'duration' => 45,
             'is_active' => true,
         ]);

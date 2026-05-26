@@ -11,6 +11,7 @@ use App\Http\Resources\BookingResource;
 use App\Models\Booking;
 use App\Models\Service;
 use App\Services\BookingAvailabilityService;
+use Carbon\Carbon;
 
 class BookingController extends Controller
 {
@@ -40,7 +41,7 @@ class BookingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreBookingRequest $request)
+    public function store(StoreBookingRequest $request, BookingAvailabilityService $bookingAvailabilityService)
     {
         $data = $request->validated();
 
@@ -58,16 +59,15 @@ class BookingController extends Controller
         $duration = $service->duration;
 
         // calculate end datetime based on start datetime and service duration
-        $endDatetime = (new \DateTime($data['start_datetime']))->add(new \DateInterval('PT' . $duration . 'M'));
+        $endDatetime = Carbon::parse($data['start_datetime'])->addMinutes($duration);
 
         // Check booking availability
-        $bookingAvailabilityService = new BookingAvailabilityService();
-        $isAvailable = $bookingAvailabilityService->isBookingAvailable(
+        $allocatedResources = $bookingAvailabilityService->isBookingAvailable(
             $request->service_id,
-            new \DateTime($request->start_datetime),
-            new \DateTime($endDatetime->format('Y-m-d H:i:s'))
+            Carbon::parse($request->start_datetime),
+            Carbon::parse($endDatetime->format('Y-m-d H:i:s'))
         );
-        if (!$isAvailable) {
+        if (!$allocatedResources) {
             return response()->json(['message' => 'The selected time slot is not available for booking.'], 400);
         }
 
@@ -84,6 +84,10 @@ class BookingController extends Controller
             'total_price' => $totalPrice,
             'status' => 'confirmed',
         ]);
+
+        if ($allocatedResources) {
+            $booking->resource()->attach($allocatedResources->pluck('id'));
+        }
 
         return new BookingResource($booking);
     }
