@@ -9,7 +9,8 @@ use App\Http\Requests\CancelBookingRequest;
 use App\Http\Requests\StoreBookingRequest;
 use App\Http\Resources\BookingResource;
 use App\Models\Booking;
-use Illuminate\Http\Request;
+use App\Models\Service;
+use App\Services\BookingAvailabilityService;
 
 class BookingController extends Controller
 {
@@ -41,7 +42,50 @@ class BookingController extends Controller
      */
     public function store(StoreBookingRequest $request)
     {
-        
+        $data = $request->validated();
+
+        $service = Service::findOrFail($data['service_id']);
+        // calculate total price
+        if ($service->pricing_type === 'one_time') {
+            $totalPrice = $service->price;
+        } 
+        if ($service->pricing_type === 'hourly') {
+            // For hourly pricing, we will calculate the total price based on the duration the service
+            $totalPrice = $service->price * $service->duration / 60;
+        }
+
+        // getservice duration
+        $duration = $service->duration;
+
+        // calculate end datetime based on start datetime and service duration
+        $endDatetime = (new \DateTime($data['start_datetime']))->add(new \DateInterval('PT' . $duration . 'M'));
+
+        // Check booking availability
+        $bookingAvailabilityService = new BookingAvailabilityService();
+        $isAvailable = $bookingAvailabilityService->isBookingAvailable(
+            $request->service_id,
+            new \DateTime($request->start_datetime),
+            new \DateTime($endDatetime->format('Y-m-d H:i:s'))
+        );
+        if (!$isAvailable) {
+            return response()->json(['message' => 'The selected time slot is not available for booking.'], 400);
+        }
+
+        // Create booking        
+        $booking = Booking::create([
+            'user_id' => auth()->id(),
+            'service_id' => $data['service_id'],
+            'customer_name' => $data['customer_name'],
+            'customer_email' => $data['customer_email'],
+            'customer_phone' => $data['customer_phone'],
+            'start_datetime' => $data['start_datetime'],
+            'end_datetime' => $endDatetime->format('Y-m-d H:i:s'),
+            'duration_minutes' => $duration, 
+            'total_price' => $totalPrice,
+            'status' => 'confirmed',
+        ]);
+
+        return new BookingResource($booking);
     }
 
     /**
