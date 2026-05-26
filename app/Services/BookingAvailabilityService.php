@@ -13,12 +13,12 @@ class BookingAvailabilityService
      * Check if a given time slot is available for booking.
      *
      * @param int $serviceId
-     * @param int|null $resourceId
+     * @param int $resourceId
      * @param \DateTime $start
      * @param \DateTime $end
      * @return bool
      */
-    public function isBookingAvailable(int $serviceId, ?int $resourceId, \DateTime $start, \DateTime $end): bool
+    public function isBookingAvailable(int $serviceId, int $resourceId, \DateTime $start, \DateTime $end): bool
     {
         // This method would contain logic to validate if the given time slot is available for the specified service and resource.
 

@@ -9,8 +9,12 @@ use Illuminate\Validation\ValidationException;
 class ResourceAvailabilityService
 {
     /**
-     * Check if a resource is available
-     * for the requested time interval.
+     * Check if resource is available for the given time slot.
+     *
+     * @param int $resourceId
+     * @param \DateTime $start
+     * @param \DateTime $end
+     * @return bool
      */
     public function isResourceAvailable(
         int $resourceId,
