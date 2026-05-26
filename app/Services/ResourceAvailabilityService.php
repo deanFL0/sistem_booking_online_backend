@@ -12,8 +12,8 @@ class ResourceAvailabilityService
      * Check if resource is available for the given time slot.
      *
      * @param int $resourceId
-     * @param \DateTime $start
-     * @param \DateTime $end
+     * @param \Carbon\Carbon $start
+     * @param \Carbon\Carbon $end
      * @return bool
      */
     public function isResourceAvailable(
@@ -30,7 +30,7 @@ class ResourceAvailabilityService
         |--------------------------------------------------------------------------
         */
 
-        if (! $resource->is_available) {
+        if (! $resource->is_active) {
             throw ValidationException::withMessages([
                 'resource' => [
                     'The selected resource is unavailable.'

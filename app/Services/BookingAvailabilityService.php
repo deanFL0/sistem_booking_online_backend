@@ -11,15 +11,20 @@ class BookingAvailabilityService
 {
     protected ResourceAvailabilityService $resourceAvailabilityService;
 
+    public function __construct(ResourceAvailabilityService $resourceAvailabilityService)
+    {
+        $this->resourceAvailabilityService = $resourceAvailabilityService;
+    }
+
     /**
      * Check if a given time slot is available for booking.
      *
      * @param int $serviceId
-     * @param \DateTime $start
-     * @param \DateTime $end
+     * @param \Carbon\Carbon $start
+     * @param \Carbon\Carbon $end
      * @return bool
      */
-    public function isBookingAvailable(int $serviceId, \DateTime $start, \DateTime $end): bool
+    public function isBookingAvailable(int $serviceId, \Carbon\Carbon $start, \Carbon\Carbon $end): bool
     {
         // This method would contain logic to validate if the given time slot is available for the specified service and resource.
 
