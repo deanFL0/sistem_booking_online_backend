@@ -11,7 +11,9 @@ use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\ResourceController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ResourceAvailabilityOverrideController;
+use App\Http\Controllers\Api\ResourceTypeController;
 use App\Http\Controllers\Api\ServiceResourceController;
+use App\Http\Controllers\Api\ServiceResourceTypeController;
 
 Route::prefix('v1')->group(function () {
     // auth routes
@@ -36,9 +38,12 @@ Route::prefix('v1')->group(function () {
         // resource routes
         Route::apiResource('/resources', ResourceController::class);
 
-        // service-resource routes
-        Route::apiResource('/services.resources', ServiceResourceController::class)
-        ->only(['index', 'store', 'show', 'destroy']);
+        // resource type routes
+        Route::apiResource('/resource-types', ResourceTypeController::class);
+
+        // service resource types routes
+        Route::apiResource('/services/{service}/resource-types', ServiceResourceTypeController::class)
+        ->only(['index', 'store', 'update', 'destroy']);
 
         // operational hour routes
         Route::scopeBindings()->group(function () {
