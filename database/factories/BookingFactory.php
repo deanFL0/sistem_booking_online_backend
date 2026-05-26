@@ -20,9 +20,9 @@ class BookingFactory extends Factory
      */
     public function definition(): array
     {
-        $bookingTime = $this->faker->time('H:i:s');
+        $bookingTime = $this->faker->dateTimeBetween('+1 days', '+1 month')->format('Y-m-d H:i:s');
         $durationMinutes = $this->faker->numberBetween(30, 180);
-        $bookingDateTime = \DateTime::createFromFormat('H:i:s', $bookingTime);
+        $bookingDateTime = \DateTime::createFromFormat('Y-m-d H:i:s', $bookingTime);
         $bookingEndDateTime = (clone $bookingDateTime)->add(new \DateInterval('PT' . $durationMinutes . 'M'));
         
         return [
@@ -32,10 +32,9 @@ class BookingFactory extends Factory
             'customer_name' => $this->faker->name,
             'customer_email' => $this->faker->unique()->safeEmail,
             'customer_phone' => $this->faker->phoneNumber,
-            'booking_date' => $this->faker->date,
-            'booking_time' => $bookingTime,
+            'start_datetime' => $bookingTime,
+            'end_datetime' => $bookingEndDateTime->format('H:i:s'),
             'duration_minutes' => $durationMinutes,
-            'booking_end_time' => $bookingEndDateTime->format('H:i:s'),
             'status' => $this->faker->randomElement(['pending', 'confirmed', 'completed', 'cancelled']),
             'total_price' => $this->faker->numberBetween(100000, 500000),
         ];

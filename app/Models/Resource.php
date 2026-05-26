@@ -37,4 +37,9 @@ class Resource extends Model
     {
         return $this->hasMany(ResourceAvailabilityOverride::class);
     }
+
+    public function services()
+    {
+        return $this->belongsToMany(Service::class);
+    }
 }

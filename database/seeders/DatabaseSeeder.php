@@ -44,18 +44,23 @@ class DatabaseSeeder extends Seeder
                     'day_of_week' => $day,
                 ]);
             }
-
-            // Create some resource availability overrides
-            ResourceAvailabilityOverride::factory(3)->create();
-
-            // Create bookings
-            Booking::factory(5)->create();
-            
-            Setting::factory()->create([
-                'key' => 'min_cancellation_hours',
-                'value' => '24',
-            ]);
         });
+
+        // Create some resource availability overrides
+        ResourceAvailabilityOverride::factory(3)->create();
+
+        // Attach services to resources
+        $serviceId = Service::first()->id;
+        $resource = Resource::first();
+        $resource->services()->attach($serviceId);
+
+        // Create bookings
+        Booking::factory(5)->create();
+        
+        Setting::factory()->create([
+            'key' => 'min_cancellation_hours',
+            'value' => '24',
+        ]);
     }
 }
 
