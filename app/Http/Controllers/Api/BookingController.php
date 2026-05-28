@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminUpdateBookingRequest;
 use App\Http\Requests\RescheduleBookingRequest;
-use App\Http\Requests\CancelBookingRequest;
 use App\Http\Requests\StoreBookingRequest;
 use App\Http\Resources\BookingResource;
 use App\Models\Booking;
@@ -45,27 +44,22 @@ class BookingController extends Controller
     {
         $data = $request->validated();
 
-        $service = Service::findOrFail($data['service_id']);
-        // calculate total price
-        if ($service->pricing_type === 'one_time') {
-            $totalPrice = $service->price;
-        } 
-        if ($service->pricing_type === 'hourly') {
-            // For hourly pricing, we will calculate the total price based on the duration the service
-            $totalPrice = $service->price * $service->duration / 60;
-        }
-
         // getservice duration
+        $service = Service::findOrFail($data['service_id']);
         $duration = $service->duration;
 
+        // calculate total price
+        $totalPrice = $bookingService->calculateTotalPrice($data['service_id']);
+
         // calculate end datetime based on start datetime and service duration
-        $endDatetime = Carbon::parse($data['start_datetime'])->addMinutes($duration);
+        $endDatetime = $bookingService->calculateEndDatetime(
+            $data['service_id'], Carbon::parse($data['start_datetime'])
+        );
 
         // Check booking availability
-        $allocatedResources = $bookingService->validateBooking(
+        $allocatedResources = $bookingService->getBookingResources(
             $request->service_id,
             Carbon::parse($request->start_datetime),
-            Carbon::parse($endDatetime->format('Y-m-d H:i:s'))
         );
 
         // Create booking        
@@ -120,26 +114,9 @@ class BookingController extends Controller
     {
         $data = $request->validated();
 
-        $service = Service::findOrFail($data['service_id']);
-        // calculate total price
-        if ($service->pricing_type === 'one_time') {
-            $totalPrice = $service->price;
-        } 
-        if ($service->pricing_type === 'hourly') {
-            // For hourly pricing, we will calculate the total price based on the duration the service
-            $totalPrice = $service->price * $service->duration / 60;
-        }
-
-        // getservice duration
-        $duration = $service->duration;
-
-        // calculate end datetime based on start datetime and service duration
-        $endDatetime = Carbon::parse($data['start_datetime'])->addMinutes($duration);
-
         $bookingService->validateBookingReschedule(
             $booking, 
             Carbon::parse($request->start_datetime), 
-            Carbon::parse($endDatetime->format('Y-m-d H:i:s'))
             );
 
         $booking->update($request->validated());

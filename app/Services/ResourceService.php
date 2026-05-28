@@ -10,6 +10,11 @@ class ResourceService
 {
     /**
      * Check if resource is available for the given time slot.
+     * @param int $resourceId
+     * @param Carbon $start
+     * @param Carbon $end
+     * @return void
+     * @throws ValidationException
      */
     public function validateResourceAvailability(
         int $resourceId,
