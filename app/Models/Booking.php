@@ -21,8 +21,9 @@ class Booking extends Model
         'start_datetime',
         'end_datetime',
         'duration_minutes',
-        'status',
         'total_price',
+        'status',
+        'completion_notified_at',
     ];
 
     protected $casts = [
