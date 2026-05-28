@@ -10,7 +10,7 @@ use App\Http\Requests\StoreBookingRequest;
 use App\Http\Resources\BookingResource;
 use App\Models\Booking;
 use App\Models\Service;
-use App\Services\BookingAvailabilityService;
+use App\Services\BookingService;
 use Carbon\Carbon;
 
 class BookingController extends Controller
@@ -41,7 +41,7 @@ class BookingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreBookingRequest $request, BookingAvailabilityService $bookingAvailabilityService)
+    public function store(StoreBookingRequest $request, BookingService $bookingService)
     {
         $data = $request->validated();
 
@@ -62,14 +62,11 @@ class BookingController extends Controller
         $endDatetime = Carbon::parse($data['start_datetime'])->addMinutes($duration);
 
         // Check booking availability
-        $allocatedResources = $bookingAvailabilityService->isBookingAvailable(
+        $allocatedResources = $bookingService->validateBooking(
             $request->service_id,
             Carbon::parse($request->start_datetime),
             Carbon::parse($endDatetime->format('Y-m-d H:i:s'))
         );
-        if (!$allocatedResources) {
-            return response()->json(['message' => 'The selected time slot is not available for booking.'], 400);
-        }
 
         // Create booking        
         $booking = Booking::create([
@@ -85,6 +82,7 @@ class BookingController extends Controller
             'status' => 'confirmed',
         ]);
 
+        // Attach allocated resources to the booking
         if ($allocatedResources) {
             $booking->resource()->attach($allocatedResources->pluck('id'));
         }
@@ -118,37 +116,41 @@ class BookingController extends Controller
         return new BookingResource($booking);
     }
 
-    public function reschedule(RescheduleBookingRequest $request, Booking $booking)
+    public function reschedule(RescheduleBookingRequest $request, Booking $booking, BookingService $bookingService)
     {
-        // Dissallow rescheduling if the booking is already cancelled or completed
-        if (in_array($booking->status, ['cancelled', 'completed'])) {
-            return response()->json(['message' => 'Booking cannot be rescheduled'], 400);
+        $data = $request->validated();
+
+        $service = Service::findOrFail($data['service_id']);
+        // calculate total price
+        if ($service->pricing_type === 'one_time') {
+            $totalPrice = $service->price;
+        } 
+        if ($service->pricing_type === 'hourly') {
+            // For hourly pricing, we will calculate the total price based on the duration the service
+            $totalPrice = $service->price * $service->duration / 60;
         }
 
-        // Dissallow rescheduling within set number of hours before the booking start time
-        $minRescheduleTime = (int) setting('minimum_reschedule', 24);
-        if ($booking->start_datetime->diffInHours(now()) < $minRescheduleTime) {
-            return response()->json(['message' => 'Booking cannot be rescheduled within ' . $minRescheduleTime . ' hours of the book time'], 400);
-        }
+        // getservice duration
+        $duration = $service->duration;
+
+        // calculate end datetime based on start datetime and service duration
+        $endDatetime = Carbon::parse($data['start_datetime'])->addMinutes($duration);
+
+        $bookingService->validateBookingReschedule(
+            $booking, 
+            Carbon::parse($request->start_datetime), 
+            Carbon::parse($endDatetime->format('Y-m-d H:i:s'))
+            );
 
         $booking->update($request->validated());
         return new BookingResource($booking);
     }
 
-    public function cancel(CancelBookingRequest $request, Booking $booking)
+    public function cancel(Booking $booking, BookingService $bookingService)
     {
-        // Dissallow cancellation if the booking is already cancelled or completed
-        if (in_array($booking->status, ['cancelled', 'completed'])) {
-            return response()->json(['message' => 'Booking cannot be cancelled'], 400);
-        }
-
-        // Dissallow cancellation within set number of hours before the booking start time
-        $minCancellationTime = (int) setting('minimum_cancel', 24);
-        if ($booking->start_datetime->diffInHours(now()) < $minCancellationTime) {
-            return response()->json(['message' => 'Booking cannot be cancelled within ' . $minCancellationTime . ' hours of the book time'], 400);
-        }
-
-        $booking->update($request->validated());
+        $bookingService->validateBookingCancellation($booking);
+        
+        $booking->update(['status' => 'cancelled']);
         return new BookingResource($booking);
     }
 

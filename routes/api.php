@@ -14,15 +14,15 @@ use App\Http\Controllers\Api\ResourceTypeController;
 use App\Http\Controllers\Api\ServiceResourceTypeController;
 
 Route::prefix('v1')->group(function () {
-    // auth routes
+    // Public routes (services and booking creation for everyone)
+    Route::get('/services', [ServiceController::class, 'index']);
+    Route::get('/services/{service}', [ServiceController::class, 'show']);
+
+    // auth routes (guest only)
     Route::middleware('guest')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
     });
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/logout', [AuthController::class, 'logout']);
-    });
-
 
     // routes for admin
     Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
@@ -31,7 +31,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/users/{user}/restore', [UserController::class, 'restore']);
 
         // service routes
-        Route::apiResource('/services', ServiceController::class);
+        Route::apiResource('/services', ServiceController::class)
+        ->except(['index', 'show']);
 
         // resource routes
         Route::apiResource('/resources', ResourceController::class);
@@ -58,10 +59,11 @@ Route::prefix('v1')->group(function () {
         ]);
 
         // bookings routes
-        Route::apiResource('/bookings', BookingController::class);
+        Route::apiResource('/bookings', BookingController::class)
+        ->except(['store']);
     });
 
-    // routes for user
+    // routes for authenticated users
     Route::middleware('auth:sanctum')->group(function () {
         // profile routes
         Route::get('/profile', [ProfileController::class, 'me']);
@@ -70,15 +72,14 @@ Route::prefix('v1')->group(function () {
         Route::post('/profile/reset-password', [ProfileController::class, 'resetPassword']);
         Route::delete('/profile', [ProfileController::class, 'destroy']);
 
-        // services routes
-        Route::get('/services', [ServiceController::class, 'index']);
-        Route::get('/services/{service}', [ServiceController::class, 'show']);
-
-        // Bookings routes
+        // Bookings routes (user-specific)
         Route::get('/my-bookings', [BookingController::class, 'myBookings']);
         Route::get('/my-bookings/{booking}', [BookingController::class, 'show']);
         Route::post('/bookings', [BookingController::class, 'store']);
         Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
         Route::patch('/bookings/{booking}/reschedule', [BookingController::class, 'reschedule']);
+
+        // Logout route
+        Route::post('/logout', [AuthController::class, 'logout']);
     });
 });

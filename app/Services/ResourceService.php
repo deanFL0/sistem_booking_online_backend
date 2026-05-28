@@ -6,16 +6,16 @@ use App\Models\Resource;
 use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
 
-class ResourceAvailabilityService
+class ResourceService
 {
     /**
      * Check if resource is available for the given time slot.
      */
-    public function isResourceAvailable(
+    public function validateResourceAvailability(
         int $resourceId,
         Carbon $start,
         Carbon $end
-    ): bool {
+    ) {
 
         $resource = Resource::findOrFail($resourceId);
 
@@ -165,7 +165,5 @@ class ResourceAvailabilityService
                 ],
             ]);
         }
-
-        return true;
     }
 }
