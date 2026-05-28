@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookingController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OperationalHourController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ServiceController;
@@ -78,6 +79,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/bookings', [BookingController::class, 'store']);
         Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
         Route::patch('/bookings/{booking}/reschedule', [BookingController::class, 'reschedule']);
+
+        // Notification Routes
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 
         // Logout route
         Route::post('/logout', [AuthController::class, 'logout']);
