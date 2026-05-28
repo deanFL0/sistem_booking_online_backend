@@ -10,7 +10,7 @@ class ResourceAvailabilityOverride extends Model
     use HasFactory;
 
     protected $table = 'resource_availability_overrides';
-    
+
     protected $fillable = [
         'resource_id',
         'date',

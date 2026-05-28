@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
-use App\Models\Service;
 use App\Http\Resources\ServiceResource;
+use App\Models\Service;
 
 class ServiceController extends Controller
 {

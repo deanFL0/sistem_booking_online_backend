@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Resources\ProfileResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
-use App\Http\Resources\ProfileResource;
 
 class ProfileController extends Controller
 {
@@ -22,6 +22,7 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
         $user->update($request->validated());
+
         return new ProfileResource($user);
     }
 
@@ -36,7 +37,7 @@ class ProfileController extends Controller
         $user->update([
             'password' => Hash::make($validated['password']),
         ]);
-        
+
         return response()->json(['message' => 'Password updated successfully'], 200);
     }
 

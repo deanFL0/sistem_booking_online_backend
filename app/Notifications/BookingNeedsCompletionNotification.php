@@ -10,9 +10,7 @@ class BookingNeedsCompletionNotification extends Notification
 {
     use Queueable;
 
-    public function __construct(public Booking $booking)
-    {
-    }
+    public function __construct(public Booking $booking) {}
 
     public function via(object $notifiable): array
     {
@@ -24,7 +22,7 @@ class BookingNeedsCompletionNotification extends Notification
         return [
             'booking_id' => $this->booking->id,
             'booking_code' => $this->booking->booking_code,
-            'message' => 'Booking needs completion',
+            'message' => 'Booking '.$this->booking->booking_code.' needs completion',
         ];
     }
 }

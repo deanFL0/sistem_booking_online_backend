@@ -43,7 +43,7 @@ class Booking extends Model
     /**
      * Get the service that belongs to the booking.
      */
-    public function service(): BelongsTo
+    public function services(): BelongsTo
     {
         return $this->belongsTo(Service::class);
     }
@@ -59,7 +59,7 @@ class Booking extends Model
     /**
      * Get the resource (barber, chair, etc.) assigned to this booking.
      */
-    public function resource(): BelongsToMany
+    public function resources(): BelongsToMany
     {
         return $this->belongsToMany(Resource::class);
     }

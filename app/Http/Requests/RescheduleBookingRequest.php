@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RescheduleBookingRequest  extends FormRequest
+class RescheduleBookingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,6 +14,7 @@ class RescheduleBookingRequest  extends FormRequest
     {
         // Check if the user is authenticated and is the owner of the booking
         $booking = $this->route('booking');
+
         return auth()->check() && $booking && $booking->user_id === auth()->id();
     }
 

@@ -1,18 +1,17 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OperationalHourController;
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\ServiceController;
-use App\Http\Controllers\Api\ResourceController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ResourceAvailabilityOverrideController;
+use App\Http\Controllers\Api\ResourceController;
 use App\Http\Controllers\Api\ResourceTypeController;
+use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\ServiceResourceTypeController;
+use App\Http\Controllers\Api\UserController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     // Public routes (services and booking creation for everyone)
@@ -33,7 +32,7 @@ Route::prefix('v1')->group(function () {
 
         // service routes
         Route::apiResource('/services', ServiceController::class)
-        ->except(['index', 'show']);
+            ->except(['index', 'show']);
 
         // resource routes
         Route::apiResource('/resources', ResourceController::class);
@@ -43,25 +42,25 @@ Route::prefix('v1')->group(function () {
 
         // service resource types routes
         Route::apiResource('/services/{service}/resource-types', ServiceResourceTypeController::class)
-        ->only(['index', 'store', 'update', 'destroy']);
+            ->only(['index', 'store', 'update', 'destroy']);
 
         // operational hour routes
         Route::scopeBindings()->group(function () {
             Route::apiResource('resources.operational-hours', OperationalHourController::class)
-            ->parameters([
-                'operational-hours' => 'operationalHour'
-            ]);
+                ->parameters([
+                    'operational-hours' => 'operationalHour',
+                ]);
         });
 
         // resource availability override routes
         Route::apiResource('/availability-overrides', ResourceAvailabilityOverrideController::class)
-        ->parameters([
-            'availability-overrides' => 'resourceAvailabilityOverride'
-        ]);
+            ->parameters([
+                'availability-overrides' => 'resourceAvailabilityOverride',
+            ]);
 
         // bookings routes
         Route::apiResource('/bookings', BookingController::class)
-        ->except(['store']);
+            ->except(['store']);
     });
 
     // routes for authenticated users

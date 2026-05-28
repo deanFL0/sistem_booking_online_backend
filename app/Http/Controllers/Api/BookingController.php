@@ -26,6 +26,7 @@ class BookingController extends Controller
     public function myBookings()
     {
         $user = auth()->user();
+
         return BookingResource::collection(Booking::where('user_id', $user->id)->paginate(25));
     }
 
@@ -62,7 +63,7 @@ class BookingController extends Controller
             Carbon::parse($request->start_datetime),
         );
 
-        // Create booking        
+        // Create booking
         $booking = Booking::create([
             'user_id' => auth()->id(),
             'service_id' => $data['service_id'],
@@ -71,7 +72,7 @@ class BookingController extends Controller
             'customer_phone' => $data['customer_phone'],
             'start_datetime' => $data['start_datetime'],
             'end_datetime' => $endDatetime->format('Y-m-d H:i:s'),
-            'duration_minutes' => $duration, 
+            'duration_minutes' => $duration,
             'total_price' => $totalPrice,
             'status' => 'confirmed',
         ]);
@@ -90,6 +91,7 @@ class BookingController extends Controller
     public function show(Booking $booking)
     {
         $this->authorize('view', $booking);
+
         return new BookingResource($booking);
     }
 
@@ -107,6 +109,7 @@ class BookingController extends Controller
     public function update(AdminUpdateBookingRequest $request, Booking $booking)
     {
         $booking->update($request->validated());
+
         return new BookingResource($booking);
     }
 
@@ -115,19 +118,21 @@ class BookingController extends Controller
         $data = $request->validated();
 
         $bookingService->validateBookingReschedule(
-            $booking, 
-            Carbon::parse($request->start_datetime), 
-            );
+            $booking,
+            Carbon::parse($request->start_datetime),
+        );
 
         $booking->update($request->validated());
+
         return new BookingResource($booking);
     }
 
     public function cancel(Booking $booking, BookingService $bookingService)
     {
         $bookingService->validateBookingCancellation($booking);
-        
+
         $booking->update(['status' => 'cancelled']);
+
         return new BookingResource($booking);
     }
 
@@ -137,6 +142,7 @@ class BookingController extends Controller
     public function destroy(Booking $booking)
     {
         $booking->delete();
+
         return response()->json(['message' => 'Booking deleted successfully'], 200);
     }
 }

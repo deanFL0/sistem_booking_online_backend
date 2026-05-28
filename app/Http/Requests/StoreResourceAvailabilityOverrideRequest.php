@@ -24,11 +24,11 @@ class StoreResourceAvailabilityOverrideRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'resource_id'=>'required|exists:resources,id',
-            'date'=>'required|date',
-            'start_time'=>'required|date_format:H:i',
-            'end_time'=>'required|date_format:H:i|after:start_time',
-            'status'=>'required|in:available,unavailable',
+            'resource_id' => 'required|exists:resources,id',
+            'date' => 'required|date',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+            'status' => 'required|in:available,unavailable',
         ];
     }
 }

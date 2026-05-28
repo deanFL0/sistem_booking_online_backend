@@ -8,7 +8,6 @@ use App\Http\Requests\UpdateOperationalHourRequest;
 use App\Http\Resources\OperationalHourResource;
 use App\Models\OperationalHour;
 use App\Models\Resource;
-use Illuminate\Http\Request;
 
 class OperationalHourController extends Controller
 {

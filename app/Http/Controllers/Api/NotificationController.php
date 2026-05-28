@@ -16,7 +16,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $notifications
+            'data' => $notifications,
         ]);
     }
 
@@ -29,8 +29,8 @@ class NotificationController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'unread_count' => $unreadCount
-            ]
+                'unread_count' => $unreadCount,
+            ],
         ]);
     }
 
@@ -45,7 +45,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Notification marked as read'
+            'message' => 'Notification marked as read',
         ]);
     }
 
@@ -57,7 +57,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'All notifications marked as read'
+            'message' => 'All notifications marked as read',
         ]);
     }
 }

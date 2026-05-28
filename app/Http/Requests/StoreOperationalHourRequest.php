@@ -24,10 +24,10 @@ class StoreOperationalHourRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'day_of_week'=>'required|integer|min:0|max:6',
-            'open_time'=>'required|date_format:H:i',
-            'close_time'=>'required|date_format:H:i|after:open_time',
-            'is_closed'=>'boolean',
+            'day_of_week' => 'required|integer|min:0|max:6',
+            'open_time' => 'required|date_format:H:i',
+            'close_time' => 'required|date_format:H:i|after:open_time',
+            'is_closed' => 'boolean',
         ];
     }
 }

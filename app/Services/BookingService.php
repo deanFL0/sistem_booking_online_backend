@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\Resource;
 use App\Models\Service;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
 class BookingService
@@ -19,9 +20,6 @@ class BookingService
 
     /**
      * Get end datetime for a booking based on service duration.
-     * @param int $serviceId
-     * @param Carbon $start
-     * @return Carbon
      */
     public function calculateEndDatetime(int $serviceId, Carbon $start): Carbon
     {
@@ -34,8 +32,7 @@ class BookingService
 
     /**
      * Calculate total price for a booking based on service pricing type and duration.
-     * @param int $serviceId
-     * @return float
+     *
      * @throws ValidationException
      */
     public function calculateTotalPrice(int $serviceId): float
@@ -44,7 +41,7 @@ class BookingService
 
         if ($service->pricing_type === 'one_time') {
             return $service->price;
-        } 
+        }
         if ($service->pricing_type === 'hourly') {
             // For hourly pricing, we will calculate the total price based on the duration the service
             return $service->price * $service->duration / 60;
@@ -57,9 +54,9 @@ class BookingService
 
     /**
      * Get available resources for a given service and time slot, and validate the booking.
-     * @param int $serviceId
-     * @param Carbon $start
-     * @return \Illuminate\Support\Collection<\App\Models\Resource>
+     *
+     * @return Collection<\App\Models\Resource>
+     *
      * @throws ValidationException
      */
     public function getBookingResources(int $serviceId, Carbon $start)
@@ -77,7 +74,7 @@ class BookingService
 
         // Calculate end datetime based on service duration
         $end = $this->calculateEndDatetime($serviceId, $start);
-        
+
         // Check resource availability
         // Get required resource types for the service
         $requiredResourceTypes = $service->resourceTypes;
@@ -148,23 +145,23 @@ class BookingService
         $minCancellationTime = (int) setting('minimum_cancel', 24);
         if ($booking->start_datetime->diffInHours(now()) < $minCancellationTime) {
             throw ValidationException::withMessages([
-                'booking' => 'This booking cannot be cancelled within ' . $minCancellationTime . ' hours of the book time.',
+                'booking' => 'This booking cannot be cancelled within '.$minCancellationTime.' hours of the book time.',
             ]);
         }
     }
 
     /**
      * Validate Booking for rescheduling
-     * @param Booking $booking
-     * @param Carbon $start
+     *
      * @return void
+     *
      * @throws ValidationException
      */
     public function validateBookingReschedule(Booking $booking, Carbon $start)
     {
         // Calculate end datetime based on service duration
         $end = $this->calculateEndDatetime($serviceId, $start);
-        
+
         // Dissallow rescheduling if the booking is already cancelled or completed
         if (in_array($booking->status, ['cancelled', 'completed'])) {
             throw ValidationException::withMessages([
@@ -176,7 +173,7 @@ class BookingService
         $minRescheduleTime = (int) setting('minimum_reschedule', 24);
         if ($booking->start_datetime->diffInHours(now()) < $minRescheduleTime) {
             throw ValidationException::withMessages([
-                'booking' => 'This booking cannot be rescheduled within ' . $minRescheduleTime . ' hours of the book time.',
+                'booking' => 'This booking cannot be rescheduled within '.$minRescheduleTime.' hours of the book time.',
             ]);
         }
 

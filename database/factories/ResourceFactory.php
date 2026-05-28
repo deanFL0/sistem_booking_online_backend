@@ -7,7 +7,7 @@ use App\Models\ResourceType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Resource>
+ * @extends Factory<resource>
  */
 class ResourceFactory extends Factory
 {
@@ -19,7 +19,7 @@ class ResourceFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->name . ' ' . $this->faker->numberBetween(1, 10),
+            'name' => $this->faker->name.' '.$this->faker->numberBetween(1, 10),
             'resource_type_id' => ResourceType::factory(),
             'description' => $this->faker->sentence,
             'is_active' => $this->faker->boolean(90), // 90% chance to be available

@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Models\Booking;
 use App\Models\Service;
 use App\Models\User;
-use App\Models\Resource;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,8 +22,8 @@ class BookingFactory extends Factory
         $bookingTime = $this->faker->dateTimeBetween('+1 days', '+1 month')->format('Y-m-d H:i:s');
         $durationMinutes = $this->faker->numberBetween(30, 180);
         $bookingDateTime = \DateTime::createFromFormat('Y-m-d H:i:s', $bookingTime);
-        $bookingEndDateTime = (clone $bookingDateTime)->add(new \DateInterval('PT' . $durationMinutes . 'M'));
-        
+        $bookingEndDateTime = (clone $bookingDateTime)->add(new \DateInterval('PT'.$durationMinutes.'M'));
+
         return [
             'user_id' => User::factory(),
             'service_id' => Service::factory(),

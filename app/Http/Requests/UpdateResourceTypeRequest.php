@@ -24,7 +24,7 @@ class UpdateResourceTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|string|max:255|unique:resource_types,name,' . $this->route('resource_type')->id,
+            'name' => 'sometimes|string|max:255|unique:resource_types,name,'.$this->route('resource_type')->id,
             'description' => 'nullable|string',
         ];
     }

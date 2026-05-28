@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Service;
+use App\Models\Booking;
 use App\Models\OperationalHour;
 use App\Models\Resource;
 use App\Models\ResourceAvailabilityOverride;
-use App\Models\Booking;
 use App\Models\ResourceType;
+use App\Models\Service;
 use App\Models\Setting;
+use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -55,7 +55,7 @@ class DatabaseSeeder extends Seeder
         Resource::factory(10)->create()->each(function ($resource) {
             // Assign a random resource type
             $resource->update(['resource_type_id' => ResourceType::inRandomOrder()->first()->id]);
-            
+
             // Create operational hours for each day of the week
             for ($day = 0; $day < 7; $day++) {
                 OperationalHour::factory()->create([
@@ -67,10 +67,10 @@ class DatabaseSeeder extends Seeder
 
         // Create some resource availability overrides
         ResourceAvailabilityOverride::factory(3)->create();
-        
+
         // Create bookings
         Booking::factory(5)->create();
-        
+
         Setting::factory()->create([
             'key' => 'min_cancellation_hours',
             'value' => '24',
@@ -211,4 +211,3 @@ class DatabaseSeeder extends Seeder
         ]);
     }
 }
-

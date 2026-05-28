@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\ResourceAvailabilityOverride;
 use App\Models\Resource;
+use App\Models\ResourceAvailabilityOverride;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

@@ -12,7 +12,7 @@ class StoreServiceRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        //check if user is authenticated and has admin role
+        // check if user is authenticated and has admin role
         return auth()->check() && auth()->user()->role === 'admin';
     }
 

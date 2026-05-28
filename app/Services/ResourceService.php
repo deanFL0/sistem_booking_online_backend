@@ -2,18 +2,22 @@
 
 namespace App\Services;
 
+use App\Models\Booking;
 use App\Models\Resource;
+use App\Models\ResourceAvailabilityOverride;
+use App\Models\User;
+use App\Notifications\ResourceOverrideConflictNotification;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
 class ResourceService
 {
     /**
      * Check if resource is available for the given time slot.
-     * @param int $resourceId
-     * @param Carbon $start
-     * @param Carbon $end
+     *
      * @return void
+     *
      * @throws ValidationException
      */
     public function validateResourceAvailability(
@@ -169,6 +173,77 @@ class ResourceService
                     'The selected resource is already booked during this time slot.',
                 ],
             ]);
+        }
+    }
+
+    /**
+     * Process a resource availability override by marking affected bookings with conflicts and notifying admins.
+     *
+     * @throws ValidationException
+     */
+    public function processOverride(
+        ResourceAvailabilityOverride $override
+    ): void {
+        // Skip if override makes resource available
+        if ($override->status === 'available') {
+            return;
+        }
+
+        $overrideStart = Carbon::parse($override->date)
+            ->setTimeFromTimeString(Carbon::parse($override->start_time)->format('H:i:s'));
+
+        $overrideEnd = Carbon::parse($override->date)
+            ->setTimeFromTimeString(Carbon::parse($override->end_time)->format('H:i:s'));
+
+        // find affected bookings
+        $affectedBookings = Booking::whereHas(
+            'resources',
+            function ($query) use ($override) {
+                $query->where(
+                    'resources.id',
+                    $override->resource_id
+                );
+            }
+        )
+            ->whereNotIn('status', ['cancelled', 'completed'])
+            ->where('start_datetime', '<', $overrideEnd)
+            ->where('end_datetime', '>', $overrideStart)
+            ->get();
+
+        // get admins to notify
+        $admins = User::where('role', 'admin')->get();
+
+        // mark conflict
+        foreach ($affectedBookings as $booking) {
+            $newConflictDetails =
+                'Resource '
+                .$override->resource->name
+                .' unavailable due to override on '
+                .Carbon::parse($override->date)->format('Y-m-d')
+                .' from '
+                .Carbon::parse($override->start_time)->format('H:i:s')
+                .' to '
+                .Carbon::parse($override->end_time)->format('H:i:s');
+
+            if (! $booking->has_conflict) {
+                $booking->has_conflict = true;
+                $booking->conflict_details = $newConflictDetails;
+            } else {
+                // Prevent duplicate conflict messages
+                if (! str_contains($booking->conflict_details, $newConflictDetails)) {
+                    $booking->conflict_details .= "\n\n".$newConflictDetails;
+                }
+            }
+            $booking->save();
+
+            // Notify admins
+            Notification::send(
+                $admins,
+                new ResourceOverrideConflictNotification(
+                    $booking,
+                    $override
+                )
+            );
         }
     }
 }

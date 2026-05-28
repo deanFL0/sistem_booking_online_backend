@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Resource;
 use App\Http\Requests\StoreResourceRequest;
 use App\Http\Requests\UpdateResourceRequest;
 use App\Http\Resources\ResourceResource;
+use App\Models\Resource;
 
 class ResourceController extends Controller
 {
@@ -24,6 +24,7 @@ class ResourceController extends Controller
     public function store(StoreResourceRequest $request)
     {
         $resource = Resource::create($request->validated());
+
         return (new ResourceResource($resource))->response()->setStatusCode(201);
     }
 
@@ -41,6 +42,7 @@ class ResourceController extends Controller
     public function update(UpdateResourceRequest $request, Resource $resource)
     {
         $resource->update($request->validated());
+
         return new ResourceResource($resource);
     }
 
@@ -50,6 +52,7 @@ class ResourceController extends Controller
     public function destroy(Resource $resource)
     {
         $resource->delete();
+
         return response()->json(['message' => 'Resource deleted successfully'], 200);
     }
 }

@@ -6,9 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreServiceResourceTypeRequest;
 use App\Http\Requests\UpdateServiceResourceTypeRequest;
 use App\Http\Resources\ResourceTypeResource;
-use App\Models\Service;
 use App\Models\ResourceType;
-use Illuminate\Http\Request;
+use App\Models\Service;
 
 class ServiceResourceTypeController extends Controller
 {

@@ -7,7 +7,7 @@ use App\Http\Requests\StoreResourceAvailabilityOverrideRequest;
 use App\Http\Requests\UpdateResourceAvailabilityOverrideRequest;
 use App\Http\Resources\ResourceAvailabilityOverrideResource;
 use App\Models\ResourceAvailabilityOverride;
-use Illuminate\Http\Request;
+use App\Services\ResourceService;
 
 class ResourceAvailabilityOverrideController extends Controller
 {
@@ -30,11 +30,15 @@ class ResourceAvailabilityOverrideController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreResourceAvailabilityOverrideRequest $request)
+    public function store(StoreResourceAvailabilityOverrideRequest $request, ResourceService $resourceService)
     {
         $resourceAvailabilityOverride = ResourceAvailabilityOverride::create($request->validated());
 
-        return (new ResourceAvailabilityOverrideResource($resourceAvailabilityOverride))->response()->setStatusCode(201);
+        $resourceService->processOverride($resourceAvailabilityOverride);
+
+        return (new ResourceAvailabilityOverrideResource(
+            $resourceAvailabilityOverride
+        ))->response()->setStatusCode(201);
     }
 
     /**
@@ -56,9 +60,11 @@ class ResourceAvailabilityOverrideController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateResourceAvailabilityOverrideRequest $request, ResourceAvailabilityOverride $resourceAvailabilityOverride)
+    public function update(UpdateResourceAvailabilityOverrideRequest $request, ResourceAvailabilityOverride $resourceAvailabilityOverride, ResourceService $resourceService)
     {
         $resourceAvailabilityOverride->update($request->validated());
+
+        $resourceService->processOverride($resourceAvailabilityOverride);
 
         return new ResourceAvailabilityOverrideResource($resourceAvailabilityOverride);
     }

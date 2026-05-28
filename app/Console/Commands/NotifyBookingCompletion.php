@@ -3,10 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Models\Booking;
-use Illuminate\Support\Facades\Notification;
 use App\Models\User;
 use App\Notifications\BookingNeedsCompletionNotification;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Notification;
 
 class NotifyBookingCompletion extends Command
 {
@@ -19,7 +19,7 @@ class NotifyBookingCompletion extends Command
             ->whereNull('completion_notified_at')
             ->get();
 
-        $admins = User::where('role', '=' ,'admin')->get();
+        $admins = User::where('role', '=', 'admin')->get();
 
         foreach ($bookings as $booking) {
             Notification::send(
@@ -28,7 +28,7 @@ class NotifyBookingCompletion extends Command
             );
 
             $booking->update([
-                'completion_notified_at' => now()
+                'completion_notified_at' => now(),
             ]);
         }
     }
