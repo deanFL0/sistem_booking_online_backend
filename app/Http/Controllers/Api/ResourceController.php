@@ -7,6 +7,7 @@ use App\Http\Requests\StoreResourceRequest;
 use App\Http\Requests\UpdateResourceRequest;
 use App\Http\Resources\ResourceResource;
 use App\Models\Resource;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ResourceController extends Controller
 {
@@ -15,7 +16,15 @@ class ResourceController extends Controller
      */
     public function index()
     {
-        return ResourceResource::collection(Resource::paginate(25));
+        $resource = QueryBuilder::for(Resource::class)
+            ->allowedIncludes('resource_type')
+            ->defaultSort('id')
+            ->allowedSorts('id', 'name', 'resource_type.name', 'is_active')
+            ->allowedFilters('name', 'resource_type.name', 'is_active')
+            ->paginate(25)
+            ->appends(request()->query());
+
+        return ResourceResource::collection($resource);
     }
 
     /**
@@ -33,6 +42,7 @@ class ResourceController extends Controller
      */
     public function show(Resource $resource)
     {
+        $resource->load('resource_type');
         return new ResourceResource($resource);
     }
 
