@@ -142,7 +142,7 @@ class BookingService
         }
 
         // Dissallow cancellation within set number of hours before the booking start time
-        $minCancellationTime = (int) setting('minimum_cancel', 24);
+        $minCancellationTime = (int) setting('min_cancellation_hours', 24);
         if ($booking->start_datetime->diffInHours(now()) < $minCancellationTime) {
             throw ValidationException::withMessages([
                 'booking' => 'This booking cannot be cancelled within '.$minCancellationTime.' hours of the book time.',
@@ -170,7 +170,7 @@ class BookingService
         }
 
         // Dissallow rescheduling within set number of hours before the booking start time
-        $minRescheduleTime = (int) setting('minimum_reschedule', 24);
+        $minRescheduleTime = (int) setting('min_reschedule_hours', 24);
         if ($booking->start_datetime->diffInHours(now()) < $minRescheduleTime) {
             throw ValidationException::withMessages([
                 'booking' => 'This booking cannot be rescheduled within '.$minRescheduleTime.' hours of the book time.',

@@ -209,5 +209,9 @@ class DatabaseSeeder extends Seeder
             'key' => 'min_cancellation_hours',
             'value' => '24',
         ]);
+        Setting::create([
+            'key' => 'min_reschedule_hours',
+            'value' => '24',
+        ]);
     }
 }

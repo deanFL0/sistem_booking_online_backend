@@ -15,8 +15,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     // Public routes (services and booking creation for everyone)
+    // service routes
     Route::get('/services', [ServiceController::class, 'index']);
     Route::get('/services/{service}', [ServiceController::class, 'show']);
+    // booking routes
+    Route::post('/bookings', [BookingController::class, 'store']);
+    Route::get('/guest-bookings/{token}', [BookingController::class, 'guestShow']);
+    Route::patch('guest-bookings/{token}/cancel', [BookingController::class, 'guestCancel']);
 
     // auth routes (guest only)
     Route::middleware('guest')->group(function () {
@@ -75,7 +80,6 @@ Route::prefix('v1')->group(function () {
         // Bookings routes (user-specific)
         Route::get('/my-bookings', [BookingController::class, 'myBookings']);
         Route::get('/my-bookings/{booking}', [BookingController::class, 'show']);
-        Route::post('/bookings', [BookingController::class, 'store']);
         Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
         Route::patch('/bookings/{booking}/reschedule', [BookingController::class, 'reschedule']);
 

@@ -24,6 +24,7 @@ class Booking extends Model
         'total_price',
         'status',
         'completion_notified_at',
+        'manage_token',
     ];
 
     protected $casts = [
@@ -32,18 +33,23 @@ class Booking extends Model
         'duration_minutes' => 'integer',
     ];
 
-    // Booking code generator
     protected static function booted()
     {
+        // Booking code generator
         static::creating(function ($booking) {
             $booking->booking_code = 'BK-'.date('Ymd').strtoupper(Str::random(6));
+
+            // Generate token for guest users to manage their bookings
+            if (! $booking->user_id) {
+                $booking->manage_token = Str::uuid();
+            }
         });
     }
 
     /**
      * Get the service that belongs to the booking.
      */
-    public function services(): BelongsTo
+    public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
     }

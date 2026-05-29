@@ -7,10 +7,12 @@ use App\Http\Requests\AdminUpdateBookingRequest;
 use App\Http\Requests\RescheduleBookingRequest;
 use App\Http\Requests\StoreBookingRequest;
 use App\Http\Resources\BookingResource;
+use App\Mail\BookingCreatedMail;
 use App\Models\Booking;
 use App\Models\Service;
 use App\Services\BookingService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 class BookingController extends Controller
 {
@@ -79,8 +81,11 @@ class BookingController extends Controller
 
         // Attach allocated resources to the booking
         if ($allocatedResources) {
-            $booking->resource()->attach($allocatedResources->pluck('id'));
+            $booking->resources()->attach($allocatedResources->pluck('id'));
         }
+
+        // Send booking confirmation email to the customer
+        Mail::to($booking->customer_email)->send(new BookingCreatedMail($booking));
 
         return new BookingResource($booking);
     }
@@ -91,6 +96,13 @@ class BookingController extends Controller
     public function show(Booking $booking)
     {
         $this->authorize('view', $booking);
+
+        return new BookingResource($booking);
+    }
+
+    public function guestShow($token)
+    {
+        $booking = Booking::where('manage_token', $token)->firstOrFail();
 
         return new BookingResource($booking);
     }
@@ -129,6 +141,17 @@ class BookingController extends Controller
 
     public function cancel(Booking $booking, BookingService $bookingService)
     {
+        $bookingService->validateBookingCancellation($booking);
+
+        $booking->update(['status' => 'cancelled']);
+
+        return new BookingResource($booking);
+    }
+
+    public function guestCancel($token, BookingService $bookingService)
+    {
+        $booking = Booking::where('manage_token', $token)->firstOrFail();
+
         $bookingService->validateBookingCancellation($booking);
 
         $booking->update(['status' => 'cancelled']);
