@@ -7,6 +7,8 @@ use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use App\Http\Resources\ServiceResource;
 use App\Models\Service;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ServiceController extends Controller
 {
@@ -15,7 +17,20 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        return ServiceResource::collection(Service::paginate(25));
+        $services = QueryBuilder::for(Service::class)
+            ->defaultSort('id')
+            ->allowedSorts('id', 'name', 'price', 'pricing_type', 'duration', 'is_active')
+            ->allowedFilters([
+                'name', 'price', 'pricing_type', 'duration', 'is_active',
+                AllowedFilter::scope('max_duration'),
+                AllowedFilter::scope('min_duration'),
+                AllowedFilter::scope('min_price'),
+                AllowedFilter::scope('max_price'),
+            ])
+            ->paginate(25)
+            ->appends(request()->query());
+
+        return ServiceResource::collection($services);
     }
 
     /**

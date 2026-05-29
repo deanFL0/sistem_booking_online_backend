@@ -17,7 +17,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = QueryBuilder::for(User::class)
+        $users = QueryBuilder::for(User::class)
             ->defaultSort('id')
             ->allowedSorts('id', 'name', 'email', 'role', 'created_at')
             ->allowedFilters([
@@ -28,7 +28,7 @@ class UserController extends Controller
             ->paginate(25)
             ->appends(request()->query());
 
-        return UserResource::collection($user);
+        return UserResource::collection($users);
     }
 
     /**
