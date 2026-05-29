@@ -47,6 +47,9 @@ class BookingController extends Controller
     {
         $data = $request->validated();
 
+        // check if customer exceed booking limit
+        $bookingService->ensureBookingLimit($data);
+
         // getservice duration
         $service = Service::findOrFail($data['service_id']);
         $duration = $service->duration;

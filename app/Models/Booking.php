@@ -46,6 +46,12 @@ class Booking extends Model
         });
     }
 
+    // get active booking
+    public function scopeActive($query)
+    {
+        return $query->whereNotIn('status', ['cancelled', 'completed', 'no_show']);
+    }
+
     /**
      * Get the service that belongs to the booking.
      */

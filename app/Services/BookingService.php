@@ -53,6 +53,40 @@ class BookingService
     }
 
     /**
+     * Check if user/email have reached booking limit
+     *
+     * @throws ValidationException
+     */
+    public function ensureBookingLimit(array $data): void
+    {
+        // Authenticated user
+        if (auth()->check()) {
+            $count = Booking::active()
+                ->where('user_id', auth()->id())
+                ->count();
+
+            if ($count >= 5) {
+                throw ValidationException::withMessages([
+                    'booking' => ['Maximum active bookings reached.'],
+                ]);
+            }
+
+            return;
+        }
+
+        // Guest
+        $count = Booking::active()
+            ->where('customer_email', $data['customer_email'])
+            ->count();
+
+        if ($count >= 1) {
+            throw ValidationException::withMessages([
+                'booking' => ['Maximum active bookings reached.'],
+            ]);
+        }
+    }
+
+    /**
      * Get available resources for a given service and time slot, and validate the booking.
      *
      * @return Collection<\App\Models\Resource>
