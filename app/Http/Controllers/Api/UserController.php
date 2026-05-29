@@ -7,6 +7,8 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class UserController extends Controller
 {
@@ -15,7 +17,18 @@ class UserController extends Controller
      */
     public function index()
     {
-        return UserResource::collection(User::paginate(25));
+        $user = QueryBuilder::for(User::class)
+            ->defaultSort('id')
+            ->allowedSorts('id', 'name', 'email', 'role', 'created_at')
+            ->allowedFilters([
+                'name', 'email', 'phone', 'role',
+                AllowedFilter::scope('created_before'),
+                AllowedFilter::scope('created_after'),
+            ])
+            ->paginate(25)
+            ->appends(request()->query());
+
+        return UserResource::collection($user);
     }
 
     /**

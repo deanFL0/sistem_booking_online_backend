@@ -55,4 +55,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Booking::class);
     }
+
+    public function scopeCreatedBefore($query, $date)
+    {
+        return $query->whereDate('created_at', '<=', $date);
+    }
+
+    public function scopeCreatedAfter($query, $date)
+    {
+        return $query->whereDate('created_at', '>=', $date);
+    }
 }
