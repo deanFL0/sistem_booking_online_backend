@@ -19,12 +19,12 @@ Route::prefix('v1')->group(function () {
     Route::get('/services', [ServiceController::class, 'index']);
     Route::get('/services/{service}', [ServiceController::class, 'show']);
     // booking routes
-    Route::post('/bookings', [BookingController::class, 'store']);
-    Route::get('/guest-bookings/{token}', [BookingController::class, 'guestShow']);
-    Route::patch('guest-bookings/{token}/cancel', [BookingController::class, 'guestCancel']);
+    Route::post('/bookings', [BookingController::class, 'store'])->middleware('throttle:booking');
+    Route::get('/guest-bookings/{token}', [BookingController::class, 'guestShow'])->whereUuid('token')->middleware('throttle:booking');
+    Route::patch('guest-bookings/{token}/cancel', [BookingController::class, 'guestCancel'])->whereUuid('token')->middleware('throttle:booking');
 
     // auth routes (guest only)
-    Route::middleware('guest')->group(function () {
+    Route::middleware(['guest', 'throttle:auth'])->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
     });
