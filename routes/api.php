@@ -21,7 +21,8 @@ Route::prefix('v1')->group(function () {
     // booking routes
     Route::post('/bookings', [BookingController::class, 'store'])->middleware('throttle:booking');
     Route::get('/guest-bookings/{token}', [BookingController::class, 'guestShow'])->whereUuid('token')->middleware('throttle:booking');
-    Route::patch('guest-bookings/{token}/cancel', [BookingController::class, 'guestCancel'])->whereUuid('token')->middleware('throttle:booking');
+    Route::post('/guest-bookings/{token}/cancel', [BookingController::class, 'guestCancel'])->whereUuid('token')->middleware('throttle:booking');
+    Route::patch('/guest-bookings/{token}/reschedule', [BookingController::class, 'guestReschedule'])->whereUuid('token')->middleware('throttle:booking');
 
     // auth routes (guest only)
     Route::middleware(['guest', 'throttle:auth'])->group(function () {
@@ -80,7 +81,7 @@ Route::prefix('v1')->group(function () {
         // Bookings routes (user-specific)
         Route::get('/my-bookings', [BookingController::class, 'myBookings']);
         Route::get('/my-bookings/{booking}', [BookingController::class, 'show']);
-        Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
+        Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
         Route::patch('/bookings/{booking}/reschedule', [BookingController::class, 'reschedule']);
 
         // Notification Routes

@@ -176,10 +176,13 @@ class BookingService
         }
 
         // Dissallow cancellation within set number of hours before the booking start time
-        $minCancellationTime = (int) setting('min_cancellation_hours', 24);
-        if ($booking->start_datetime->diffInHours(now()) < $minCancellationTime) {
+        $minRescheduleTime = (int) setting('min_reschedule_hours', 24);
+        $hoursUntilBooking = now()->diffInHours($booking->start_datetime, false);
+        if ($hoursUntilBooking < $minRescheduleTime) {
             throw ValidationException::withMessages([
-                'booking' => 'This booking cannot be cancelled within '.$minCancellationTime.' hours of the book time.',
+                'booking' => 'This booking cannot be cancelled within '
+                    .$minRescheduleTime
+                    .' hours of the booking time.',
             ]);
         }
     }
@@ -194,7 +197,7 @@ class BookingService
     public function validateBookingReschedule(Booking $booking, Carbon $start)
     {
         // Calculate end datetime based on service duration
-        $end = $this->calculateEndDatetime($serviceId, $start);
+        $end = $this->calculateEndDatetime($booking->service_id, $start);
 
         // Dissallow rescheduling if the booking is already cancelled or completed
         if (in_array($booking->status, ['cancelled', 'completed'])) {
@@ -205,13 +208,16 @@ class BookingService
 
         // Dissallow rescheduling within set number of hours before the booking start time
         $minRescheduleTime = (int) setting('min_reschedule_hours', 24);
-        if ($booking->start_datetime->diffInHours(now()) < $minRescheduleTime) {
+        $hoursUntilBooking = now()->diffInHours($booking->start_datetime, false);
+        if ($hoursUntilBooking < $minRescheduleTime) {
             throw ValidationException::withMessages([
-                'booking' => 'This booking cannot be rescheduled within '.$minRescheduleTime.' hours of the book time.',
+                'booking' => 'This booking cannot be rescheduled within '
+                    .$minRescheduleTime
+                    .' hours of the booking time.',
             ]);
         }
 
         // Check booking availability for the new time slot
-        $this->validateBooking($booking->service_id, $start, $end);
+        $this->getBookingResources($booking->service_id, $start);
     }
 }

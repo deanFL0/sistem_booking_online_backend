@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Booking;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,10 +13,26 @@ class RescheduleBookingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Check if the user is authenticated and is the owner of the booking
-        $booking = $this->route('booking');
+        $token = $this->route('token');
 
-        return auth()->check() && $booking && $booking->user_id === auth()->id();
+        $booking = Booking::where('manage_token', $token)->first();
+
+        if (! $booking) {
+            return false;
+        }
+
+        // Store for later if needed
+        $this->merge([
+            'guest_booking' => $booking,
+        ]);
+
+        // Authenticated owner
+        if (auth()->check()) {
+            return $booking->user_id === auth()->id();
+        }
+
+        // Guest access via token
+        return true;
     }
 
     /**

@@ -7,7 +7,9 @@ use App\Http\Requests\AdminUpdateBookingRequest;
 use App\Http\Requests\RescheduleBookingRequest;
 use App\Http\Requests\StoreBookingRequest;
 use App\Http\Resources\BookingResource;
+use App\Mail\BookingCancelledMail;
 use App\Mail\BookingCreatedMail;
+use App\Mail\BookingRescheduledMail;
 use App\Models\Booking;
 use App\Models\Service;
 use App\Services\BookingService;
@@ -130,7 +132,7 @@ class BookingController extends Controller
 
     public function reschedule(RescheduleBookingRequest $request, Booking $booking, BookingService $bookingService)
     {
-        $data = $request->validated();
+        $request->validated();
 
         $bookingService->validateBookingReschedule(
             $booking,
@@ -138,6 +140,28 @@ class BookingController extends Controller
         );
 
         $booking->update($request->validated());
+
+        // Send booking confirmation email to the customer
+        Mail::to($booking->customer_email)->send(new BookingRescheduledMail($booking));
+
+        return new BookingResource($booking);
+    }
+
+    public function guestReschedule(RescheduleBookingRequest $request, $token, BookingService $bookingService)
+    {
+        $request->validated();
+
+        $booking = Booking::where('manage_token', $token)->firstOrFail();
+
+        $bookingService->validateBookingReschedule(
+            $booking,
+            Carbon::parse($request->start_datetime),
+        );
+
+        $booking->update($request->validated());
+
+        // Send booking confirmation email to the customer
+        Mail::to($booking->customer_email)->send(new BookingRescheduledMail($booking));
 
         return new BookingResource($booking);
     }
@@ -147,6 +171,9 @@ class BookingController extends Controller
         $bookingService->validateBookingCancellation($booking);
 
         $booking->update(['status' => 'cancelled']);
+
+        // Send booking confirmation email to the customer
+        Mail::to($booking->customer_email)->send(new BookingCancelledMail($booking));
 
         return new BookingResource($booking);
     }
@@ -158,6 +185,9 @@ class BookingController extends Controller
         $bookingService->validateBookingCancellation($booking);
 
         $booking->update(['status' => 'cancelled']);
+
+        // Send booking confirmation email to the customer
+        Mail::to($booking->customer_email)->send(new BookingCancelledMail($booking));
 
         return new BookingResource($booking);
     }
