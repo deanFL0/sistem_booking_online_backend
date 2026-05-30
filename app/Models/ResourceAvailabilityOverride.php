@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,5 +27,21 @@ class ResourceAvailabilityOverride extends Model
     public function resource()
     {
         return $this->belongsTo(Resource::class);
+    }
+
+    public function scopeBeforeTime($query, $time)
+    {
+        return $query->where('start_time', '<=', $time);
+    }
+
+    public function scopeAfterTime($query, $time)
+    {
+        return $query->where('end_time', '>=', $time);
+    }
+
+    public function scopeOnDay($query, $date)
+    {
+        return $query->where('start_time', '<', Carbon::parse($date)->endOfDay())
+            ->where('end_time', '>', Carbon::parse($date)->startOfDay());
     }
 }

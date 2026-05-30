@@ -8,6 +8,8 @@ use App\Http\Requests\UpdateResourceAvailabilityOverrideRequest;
 use App\Http\Resources\ResourceAvailabilityOverrideResource;
 use App\Models\ResourceAvailabilityOverride;
 use App\Services\ResourceService;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ResourceAvailabilityOverrideController extends Controller
 {
@@ -16,7 +18,19 @@ class ResourceAvailabilityOverrideController extends Controller
      */
     public function index()
     {
-        return ResourceAvailabilityOverrideResource::collection(ResourceAvailabilityOverride::paginate(25));
+        $override = QueryBuilder::for(ResourceAvailabilityOverrideResource::class)
+        ->defaultSort('id')
+        ->allowedSorts('id', 'resource.name', 'start_time', 'end_time', 'status')
+        ->allowedFilters([
+            'resource.name',
+            AllowedFilter::scope('before_time'),
+            AllowedFilter::scope('after_time'),
+            AllowedFilter::scope('on_day'),
+        ])
+        ->paginate(25)
+        ->appends(request()->query());
+
+        return ResourceAvailabilityOverrideResource::collection($override);
     }
 
     /**
