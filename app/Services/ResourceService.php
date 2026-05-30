@@ -189,11 +189,9 @@ class ResourceService
             return;
         }
 
-        $overrideStart = Carbon::parse($override->date)
-            ->setTimeFromTimeString(Carbon::parse($override->start_time)->format('H:i:s'));
+        $overrideStart = Carbon::parse($override->start_time);
 
-        $overrideEnd = Carbon::parse($override->date)
-            ->setTimeFromTimeString(Carbon::parse($override->end_time)->format('H:i:s'));
+        $overrideEnd = Carbon::parse($override->end_time);
 
         // find affected bookings
         $affectedBookings = Booking::whereHas(
@@ -218,12 +216,10 @@ class ResourceService
             $newConflictDetails =
                 'Resource '
                 .$override->resource->name
-                .' unavailable due to override on '
-                .Carbon::parse($override->date)->format('Y-m-d')
-                .' from '
-                .Carbon::parse($override->start_time)->format('H:i:s')
+                .' unavailable due to override from '
+                .Carbon::parse($override->start_time)->format('Y-m-d H:i:s')
                 .' to '
-                .Carbon::parse($override->end_time)->format('H:i:s');
+                .Carbon::parse($override->end_time)->format('Y-m-d H:i:s');
 
             if (! $booking->has_conflict) {
                 $booking->has_conflict = true;

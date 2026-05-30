@@ -60,7 +60,7 @@ class BookingService
     public function ensureBookingLimit(array $data): void
     {
         // Authenticated user
-        if (auth()->check()) {
+        if (auth('sanctum')->check()) {
             $count = Booking::active()
                 ->where('user_id', auth()->id())
                 ->count();

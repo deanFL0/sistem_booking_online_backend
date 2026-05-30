@@ -14,9 +14,8 @@ return new class extends Migration
         Schema::create('resource_availability_overrides', function (Blueprint $table) {
             $table->id();
             $table->foreignId('resource_id')->constrained('resources')->onDelete('cascade');
-            $table->date('date');
-            $table->time('start_time');
-            $table->time('end_time');
+            $table->dateTime('start_time');
+            $table->dateTime('end_time');
             $table->enum('status', ['available', 'unavailable']);
             $table->timestamps();
         });

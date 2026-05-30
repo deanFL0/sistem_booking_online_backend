@@ -13,16 +13,14 @@ class ResourceAvailabilityOverride extends Model
 
     protected $fillable = [
         'resource_id',
-        'date',
         'start_time',
         'end_time',
         'status',
     ];
 
     protected $casts = [
-        'date' => 'date',
-        'start_time' => 'datetime:H:i:s',
-        'end_time' => 'datetime:H:i:s',
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
     ];
 
     public function resource()

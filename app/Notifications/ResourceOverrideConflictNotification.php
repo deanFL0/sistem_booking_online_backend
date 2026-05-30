@@ -29,7 +29,6 @@ class ResourceOverrideConflictNotification extends Notification
                 .' conflicts with resource override.',
 
             'resource_id' => $this->override->resource_id,
-            'date' => $this->override->date,
             'start_time' => $this->override->start_time,
             'end_time' => $this->override->end_time,
         ];

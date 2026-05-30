@@ -18,14 +18,14 @@ class ResourceAvailabilityOverrideFactory extends Factory
      */
     public function definition(): array
     {
+        $date = $this->faker->dateTimeBetween('+1 day', '+30 days')->format('Y-m-d');
         $startHour = $this->faker->numberBetween(6, 12);
         $endHour = $this->faker->numberBetween($startHour + 1, 18);
 
         return [
             'resource_id' => Resource::factory(),
-            'date' => $this->faker->dateTimeBetween('+1 day', '+30 days')->format('Y-m-d'),
-            'start_time' => sprintf('%02d:00:00', $startHour),
-            'end_time' => sprintf('%02d:00:00', $endHour),
+            'start_time' => sprintf('%s %02d:00:00', $date, $startHour),
+            'end_time' => sprintf('%s %02d:00:00', $date, $endHour),
             'status' => $this->faker->randomElement(['available', 'unavailable']),
         ];
     }
