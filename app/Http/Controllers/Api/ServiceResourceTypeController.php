@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateServiceResourceTypeRequest;
 use App\Http\Resources\ResourceTypeResource;
 use App\Models\ResourceType;
 use App\Models\Service;
+use App\QueryBuilder\ServiceResourceTypeQuery;
 
 class ServiceResourceTypeController extends Controller
 {
@@ -16,7 +17,11 @@ class ServiceResourceTypeController extends Controller
      */
     public function index(Service $service)
     {
-        return ResourceTypeResource::collection($service->resourceTypes);
+        $resourceType = ServiceResourceTypeQuery::build($service)
+            ->paginate(25)
+            ->appends(request()->query());
+
+        return ResourceTypeResource::collection($resourceType);
     }
 
     /**
