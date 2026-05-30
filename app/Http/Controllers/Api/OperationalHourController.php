@@ -24,8 +24,8 @@ class OperationalHourController extends Controller
         ->allowedSorts('id', 'day_of_week', 'open_time', 'close_time', 'is_closed')
         ->allowedFilters([
             'day_of_week', 'is_closed',
-            AllowedFilter::scope('before_time'),
-            AllowedFilter::scope('after_time'),
+            AllowedFilter::scope('min_time'),
+            AllowedFilter::scope('max_time'),
         ])
         ->paginate(25)
         ->appends(request()->query());

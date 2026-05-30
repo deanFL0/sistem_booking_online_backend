@@ -19,7 +19,7 @@ class ResourceController extends Controller
         $resource = QueryBuilder::for(Resource::class)
             ->allowedIncludes('resource_type')
             ->defaultSort('id')
-            ->allowedSorts('id', 'name', 'resource_type.name', 'is_active')
+            ->allowedSorts('id', 'name', 'is_active')
             ->allowedFilters('name', 'resource_type.name', 'is_active')
             ->paginate(25)
             ->appends(request()->query());
@@ -42,7 +42,7 @@ class ResourceController extends Controller
      */
     public function show(Resource $resource)
     {
-        $resource->load('resource_type');
+        $resource->load('resource_type', 'operational_hours', 'availability_overrides');
         return new ResourceResource($resource);
     }
 

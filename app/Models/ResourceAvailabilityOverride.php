@@ -29,14 +29,14 @@ class ResourceAvailabilityOverride extends Model
         return $this->belongsTo(Resource::class);
     }
 
-    public function scopeBeforeTime($query, $time)
+    public function scopeMinTime($query, $minTime)
     {
-        return $query->where('start_time', '<=', $time);
+        return $query->where('start_time', '>=', $minTime);
     }
 
-    public function scopeAfterTime($query, $time)
+    public function scopeMaxTime($query, $maxTime)
     {
-        return $query->where('end_time', '>=', $time);
+        return $query->where('end_time', '<=', $maxTime);
     }
 
     public function scopeOnDay($query, $date)

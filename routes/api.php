@@ -59,10 +59,12 @@ Route::prefix('v1')->group(function () {
         });
 
         // resource availability override routes
-        Route::apiResource('/availability-overrides', ResourceAvailabilityOverrideController::class)
-            ->parameters([
-                'availability-overrides' => 'resourceAvailabilityOverride',
-            ]);
+        Route::scopeBindings()->group(function () {
+            Route::apiResource('resources.availability-overrides', ResourceAvailabilityOverrideController::class)
+                ->parameters([
+                    'availability-overrides' => 'resourceAvailabilityOverride',
+                ]);
+        });
 
         // bookings routes
         Route::apiResource('/bookings', BookingController::class)
