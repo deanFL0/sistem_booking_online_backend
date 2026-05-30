@@ -18,14 +18,13 @@ class ResourceAvailabilityOverrideController extends Controller
      */
     public function index()
     {
-        $override = QueryBuilder::for(ResourceAvailabilityOverrideResource::class)
+        $override = QueryBuilder::for(ResourceAvailabilityOverride::class)
         ->defaultSort('id')
-        ->allowedSorts('id', 'resource.name', 'start_time', 'end_time', 'status')
+        ->allowedSorts('id', 'start_time', 'end_time', 'status')
         ->allowedFilters([
-            'resource.name',
-            AllowedFilter::scope('before_time'),
-            AllowedFilter::scope('after_time'),
-            AllowedFilter::scope('on_day'),
+            'start_time', 'end_time', 'status',
+            AllowedFilter::scope('min_time'),
+            AllowedFilter::scope('max_time'),
         ])
         ->paginate(25)
         ->appends(request()->query());

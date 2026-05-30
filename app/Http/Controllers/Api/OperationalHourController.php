@@ -8,6 +8,8 @@ use App\Http\Requests\UpdateOperationalHourRequest;
 use App\Http\Resources\OperationalHourResource;
 use App\Models\OperationalHour;
 use App\Models\Resource;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class OperationalHourController extends Controller
 {
@@ -16,7 +18,19 @@ class OperationalHourController extends Controller
      */
     public function index(Resource $resource)
     {
-        return new OperationalHourResource($resource->operationalHours()->paginate(25));
+        $operationalHour = QueryBuilder::for(OperationalHour::class)
+        ->where('resource_id', $resource->id)
+        ->defaultSort('id')
+        ->allowedSorts('id', 'day_of_week', 'open_time', 'close_time', 'is_closed')
+        ->allowedFilters([
+            'day_of_week', 'is_closed',
+            AllowedFilter::scope('before_time'),
+            AllowedFilter::scope('after_time'),
+        ])
+        ->paginate(25)
+        ->appends(request()->query());
+        
+        return new OperationalHourResource($operationalHour);
     }
 
     /**
