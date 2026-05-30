@@ -75,4 +75,34 @@ class Booking extends Model
     {
         return $this->belongsToMany(Resource::class);
     }
+
+    public function scopeMinStartTime($query, $minTime)
+    {
+        return $query->where('start_datetime', '>=', $minTime);
+    }
+
+    public function scopeMaxEndTime($query, $maxTime)
+    {
+        return $query->where('end_datetime', '<=', $maxTime);
+    }
+
+    public function scopeMinDuration($query, $minDuration)
+    {
+        return $query->where('duration_minutes', '>=', $minDuration);
+    }
+
+    public function scopeMaxDuration($query, $maxDuration)
+    {
+        return $query->where('duration_minutes', '<=', $maxDuration);
+    }
+
+    public function scopeMinPrice($query, $minPrice)
+    {
+        return $query->where('total_price', '>=', $minPrice);
+    }
+
+    public function scopeMaxPrice($query, $maxPrice)
+    {
+        return $query->where('total_price', '<=', $maxPrice);
+    }
 }

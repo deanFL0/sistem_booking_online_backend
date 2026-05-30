@@ -15,6 +15,8 @@ use App\Models\Service;
 use App\Services\BookingService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class BookingController extends Controller
 {
@@ -23,7 +25,29 @@ class BookingController extends Controller
      */
     public function index()
     {
-        return BookingResource::collection(Booking::paginate(25));
+        $bookings = QueryBuilder::for(Booking::class)
+        ->defaultSort('id')
+        ->allowedSorts(
+            'id', 'customer_name', 'customer_email', 
+            'start_datetime', 'end_datetime', 'duration_minutes', 
+            'total_price', 'status'
+            )
+        ->allowedIncludes('service')
+        ->allowedFilters([
+            'customer_name', 'customer_email', 'customer_phone',
+            'start_datetime', 'end_datetime', 'duration_minutes', 
+            'total_price', 'status', 'service.name',
+            AllowedFilter::scope('min_time'),
+            AllowedFilter::scope('max_time'),
+            AllowedFilter::scope('min_duration'),
+            AllowedFilter::scope('max_duration'),
+            AllowedFilter::scope('min_price'),
+            AllowedFilter::scope('max_price'),
+            ])
+        ->paginate(25)
+        ->appends(request()->query());
+
+        return BookingResource::collection($bookings);
     }
 
     // Display list of bookings for the authenticated user
@@ -102,13 +126,14 @@ class BookingController extends Controller
     {
         $this->authorize('view', $booking);
 
+        $booking->load('service');
         return new BookingResource($booking);
     }
 
     public function guestShow($token)
     {
         $booking = Booking::where('manage_token', $token)->firstOrFail();
-
+        $booking->load('service');
         return new BookingResource($booking);
     }
 
