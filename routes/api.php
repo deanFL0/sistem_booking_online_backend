@@ -25,7 +25,7 @@ Route::prefix('v1')->group(function () {
     Route::patch('/guest-bookings/{token}/reschedule', [BookingController::class, 'guestReschedule'])->whereUuid('token')->middleware('throttle:booking');
 
     // auth routes (guest only)
-    Route::middleware(['guest', 'throttle:auth'])->group(function () {
+    Route::middleware(['throttle:auth'])->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
     });
