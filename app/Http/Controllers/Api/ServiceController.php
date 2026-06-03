@@ -27,6 +27,7 @@ class ServiceController extends Controller
                 AllowedFilter::scope('min_price'),
                 AllowedFilter::scope('max_price'),
             ])
+            ->
             ->paginate(25)
             ->appends(request()->query());
 
