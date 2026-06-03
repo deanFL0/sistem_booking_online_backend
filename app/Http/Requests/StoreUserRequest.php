@@ -29,7 +29,7 @@ class StoreUserRequest extends FormRequest
             'password' => [
                 'required',
                 'confirmed',
-                'regex:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/',
+                'regex:/^(?=.*[A-Za-z])(?=.*\d){8,}$/',
             ],
         ];
     }
