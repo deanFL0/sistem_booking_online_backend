@@ -67,6 +67,7 @@ Route::prefix('v1')->group(function () {
         });
 
         // bookings routes
+        Route::get('/bookings/stats', [BookingController::class, 'stats']);
         Route::apiResource('/bookings', BookingController::class)
             ->except(['store']);
     });

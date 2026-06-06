@@ -14,6 +14,8 @@ use App\Models\Booking;
 use App\Models\Service;
 use App\Services\BookingService;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -26,26 +28,26 @@ class BookingController extends Controller
     public function index()
     {
         $bookings = QueryBuilder::for(Booking::class)
-        ->defaultSort('id')
-        ->allowedSorts(
-            'id', 'customer_name', 'customer_email', 
-            'start_datetime', 'end_datetime', 'duration_minutes', 
-            'total_price', 'status'
+            ->defaultSort('id')
+            ->allowedSorts(
+                'id', 'customer_name', 'customer_email',
+                'start_datetime', 'end_datetime', 'duration_minutes',
+                'total_price', 'status'
             )
-        ->allowedIncludes('service')
-        ->allowedFilters([
-            'customer_name', 'customer_email', 'customer_phone',
-            'start_datetime', 'end_datetime', 'duration_minutes', 
-            'total_price', 'status', 'service.name',
-            AllowedFilter::scope('min_time'),
-            AllowedFilter::scope('max_time'),
-            AllowedFilter::scope('min_duration'),
-            AllowedFilter::scope('max_duration'),
-            AllowedFilter::scope('min_price'),
-            AllowedFilter::scope('max_price'),
+            ->allowedIncludes('service')
+            ->allowedFilters([
+                'customer_name', 'customer_email', 'customer_phone',
+                'start_datetime', 'end_datetime', 'duration_minutes',
+                'total_price', 'status', 'service.name',
+                AllowedFilter::scope('min_time'),
+                AllowedFilter::scope('max_time'),
+                AllowedFilter::scope('min_duration'),
+                AllowedFilter::scope('max_duration'),
+                AllowedFilter::scope('min_price'),
+                AllowedFilter::scope('max_price'),
             ])
-        ->paginate(25)
-        ->appends(request()->query());
+            ->paginate(25)
+            ->appends(request()->query());
 
         return BookingResource::collection($bookings);
     }
@@ -127,6 +129,7 @@ class BookingController extends Controller
         $this->authorize('view', $booking);
 
         $booking->load('service');
+
         return new BookingResource($booking);
     }
 
@@ -134,6 +137,7 @@ class BookingController extends Controller
     {
         $booking = Booking::where('manage_token', $token)->firstOrFail();
         $booking->load('service');
+
         return new BookingResource($booking);
     }
 
@@ -225,5 +229,151 @@ class BookingController extends Controller
         $booking->delete();
 
         return response()->json(['message' => 'Booking deleted successfully'], 200);
+    }
+
+    public function stats()
+    {
+        $range = request()->input('range', 'month');
+
+        $now = Carbon::now();
+
+        switch ($range) {
+            case 'week':
+                $start = $now->copy()->startOfWeek();
+                $end = $now->copy()->endOfWeek();
+
+                $dateFormat = 'YYYY-MM-DD';
+                $periodFormat = 'Y-m-d';
+                $periodInterval = '1 day';
+
+                break;
+
+            case 'year':
+                $start = $now->copy()->startOfYear();
+                $end = $now->copy()->endOfYear();
+
+                $dateFormat = 'YYYY-MM';
+                $periodFormat = 'Y-m';
+                $periodInterval = '1 month';
+
+                break;
+
+            case 'month':
+            default:
+                $start = $now->copy()->startOfMonth();
+                $end = $now->copy()->endOfMonth();
+
+                $dateFormat = 'YYYY-MM-DD';
+                $periodFormat = 'Y-m-d';
+                $periodInterval = '1 day';
+
+                $range = 'month';
+
+                break;
+        }
+
+        $rows = Booking::query()
+            ->select(
+                DB::raw("
+                TO_CHAR(start_datetime, '{$dateFormat}')
+                as period
+            "),
+
+                DB::raw("
+                    COUNT(
+                        CASE
+                            WHEN status = 'pending'
+                            THEN 1
+                        END
+                    ) as pending
+            "),
+
+                DB::raw("
+                COUNT(
+                    CASE
+                        WHEN status = 'confirmed'
+                        THEN 1
+                    END
+                ) as confirmed
+            "),
+
+                DB::raw("
+                COUNT(
+                    CASE
+                        WHEN status = 'cancelled'
+                        THEN 1
+                    END
+                ) as cancelled
+            "),
+
+                DB::raw("
+                COUNT(
+                    CASE
+                        WHEN status = 'completed'
+                        THEN 1
+                    END
+                ) as completed
+            "),
+
+                DB::raw("
+                COUNT(
+                    CASE
+                        WHEN status = 'no_show'
+                        THEN 1
+                    END
+                ) as no_show
+            "),
+            )
+            ->whereBetween('start_datetime', [
+                $start,
+                $end,
+            ])
+            ->groupBy(DB::raw("TO_CHAR(start_datetime, '{$dateFormat}')"))  // Group by the same expression
+            ->orderBy(DB::raw("TO_CHAR(start_datetime, '{$dateFormat}')"))
+            ->get()
+            ->keyBy('period');
+
+        $period = CarbonPeriod::create(
+            $start,
+            $periodInterval,
+            $end
+        );
+
+        $data = [];
+
+        foreach ($period as $date) {
+            $key = $date->format($periodFormat);
+
+            $row = $rows->get($key);
+
+            $data[] = [
+                'date' => $key,
+
+                'pending' => $row
+                    ? (int) $row->pending
+                    : 0,
+
+                'confirmed' => $row
+                    ? (int) $row->confirmed
+                    : 0,
+
+                'cancelled' => $row
+                    ? (int) $row->cancelled
+                    : 0,
+
+                'completed' => $row
+                    ? (int) $row->completed
+                    : 0,
+
+                'no_show' => $row
+                    ? (int) $row->no_show
+                    : 0,
+            ];
+        }
+
+        return response()->json([
+            'range' => $range,
+            'data' => $data,
+        ]);
     }
 }
