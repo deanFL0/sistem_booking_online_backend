@@ -228,9 +228,4 @@ class BookingController extends Controller
 
         return response()->json(['message' => 'Booking deleted successfully'], 200);
     }
-
-    public function stats()
-    {
-        return response()->json(Booking::stats(request()->input('range', 'month')));
-    }
 }

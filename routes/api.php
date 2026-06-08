@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookingController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OperationalHourController;
 use App\Http\Controllers\Api\ProfileController;
@@ -67,9 +68,11 @@ Route::prefix('v1')->group(function () {
         });
 
         // bookings routes
-        Route::get('/bookings/stats', [BookingController::class, 'stats']);
         Route::apiResource('/bookings', BookingController::class)
             ->except(['store']);
+
+        // dashboard route
+        Route::get('/dashboard', [DashboardController::class, 'index']);
     });
 
     // routes for authenticated users
