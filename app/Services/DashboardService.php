@@ -181,4 +181,29 @@ class DashboardService
             })
             ->toArray();
     }
+
+    /**
+     * Get bookings that have conflicts.
+     */
+    public function getConflictedBookings(): array
+    {
+        $today = Carbon::today();
+
+        return Booking::query()
+            ->where('status', 'confirmed')
+            ->where('has_conflict', true)
+            ->whereDate('start_datetime', '>=', $today)
+            ->orderBy('start_datetime')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'booking_code' => $item->booking_code,
+                    'customer_name' => $item->customer_name,
+                    'start_datetime' => $item->start_datetime
+                        ->toDateTimeString(),
+                ];
+            })
+            ->toArray();
+    }
 }
