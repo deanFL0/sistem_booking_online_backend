@@ -12,6 +12,8 @@ class DashboardController extends Controller
         return response()->json([
             'data' => [
                 'booking_stats' => $dashboardService->getBookingStats(),
+                'popular_services' => $dashboardService->getPopularServices(),
+                'resource_availability_overrides' => $dashboardService->getUpcomingResourceOverrides(),
             ],
         ]);
     }

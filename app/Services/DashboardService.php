@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Booking;
+use App\Models\ResourceAvailabilityOverride;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
@@ -92,5 +93,92 @@ class DashboardService
             'month' => $this->getBookingStatsByRange('month'),
             'year' => $this->getBookingStatsByRange('year'),
         ];
+    }
+
+    /**
+     * Get popular services based on booking count.
+     *
+     * @param  int  $limit  The number of popular services to return
+     * @param  int  $days  The number of days to consider
+     */
+    public function getPopularServices(int $limit = 5, int $days = 30): array
+    {
+        return Booking::query()
+            ->where('status', 'completed')
+            ->where('created_at', '>=', now()->subDays($days))
+            ->select('service_id', DB::raw('COUNT(*) as total_bookings'))
+            ->groupBy('service_id')
+            ->orderByDesc('total_bookings')
+            ->limit($limit)
+            ->with('service:id,name')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'service_id' => $item->service_id,
+                    'service_name' => $item->service?->name,
+                    'total_bookings' => (int) $item->total_bookings,
+                ];
+            })
+            ->toArray();
+    }
+
+    /**
+     * Get resource availability overrides for today and tomorrow.
+     */
+    public function getUpcomingResourceOverrides(): array
+    {
+        $today = Carbon::today();
+        $tomorrow = Carbon::tomorrow();
+        $end = $tomorrow->copy()->endOfDay();
+
+        return ResourceAvailabilityOverride::query()
+            ->with('resource:id,name')
+            ->where('start_time', '<=', $end)
+            ->where('end_time', '>=', $today)
+            ->orderBy('start_time')
+            ->get()
+            ->map(function ($item) {
+                $start = Carbon::parse($item->start_time);
+                $end = Carbon::parse($item->end_time);
+                $now = Carbon::now();
+
+                // Day label
+                if ($start->isToday()) {
+                    $dayLabel = 'Today';
+                } elseif ($start->isTomorrow()) {
+                    $dayLabel = 'Tomorrow';
+                } else {
+                    $dayLabel = $start->format('M j');
+                }
+
+                // Time formatting
+                if ($start->isSameDay($end)) {
+                    $displayTime =
+                        $dayLabel.
+                        ' • '.
+                        $start->format('H:i').
+                        ' - '.
+                        $end->format('H:i');
+                } else {
+                    $displayTime =
+                        $start->format('M j H:i').
+                        ' → '.
+                        $end->format('M j H:i');
+                }
+
+                return [
+                    'id' => $item->id,
+                    'resource_id' => $item->resource_id,
+                    'resource_name' => $item->resource?->name,
+                    'status' => $item->status,
+                    'display_time' => $displayTime,
+                    'is_ongoing' => $now->between(
+                        $start,
+                        $end
+                    ),
+                    'reason' => $item->reason,
+                ];
+            })
+            ->toArray();
     }
 }

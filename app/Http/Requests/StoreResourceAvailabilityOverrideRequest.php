@@ -24,7 +24,6 @@ class StoreResourceAvailabilityOverrideRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'resource_id' => 'required|exists:resources,id',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
             'status' => 'required|in:available,unavailable',

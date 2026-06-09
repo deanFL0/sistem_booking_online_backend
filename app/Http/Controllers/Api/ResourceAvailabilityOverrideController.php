@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreResourceAvailabilityOverrideRequest;
 use App\Http\Requests\UpdateResourceAvailabilityOverrideRequest;
 use App\Http\Resources\ResourceAvailabilityOverrideResource;
+use App\Models\Resource;
 use App\Models\ResourceAvailabilityOverride;
 use App\Services\ResourceService;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -19,15 +20,15 @@ class ResourceAvailabilityOverrideController extends Controller
     public function index()
     {
         $override = QueryBuilder::for(ResourceAvailabilityOverride::class)
-        ->defaultSort('id')
-        ->allowedSorts('id', 'start_time', 'end_time', 'status')
-        ->allowedFilters([
-            'start_time', 'end_time', 'status',
-            AllowedFilter::scope('min_time'),
-            AllowedFilter::scope('max_time'),
-        ])
-        ->paginate(25)
-        ->appends(request()->query());
+            ->defaultSort('id')
+            ->allowedSorts('id', 'start_time', 'end_time', 'status')
+            ->allowedFilters([
+                'start_time', 'end_time', 'status',
+                AllowedFilter::scope('min_time'),
+                AllowedFilter::scope('max_time'),
+            ])
+            ->paginate(25)
+            ->appends(request()->query());
 
         return ResourceAvailabilityOverrideResource::collection($override);
     }
@@ -43,9 +44,9 @@ class ResourceAvailabilityOverrideController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreResourceAvailabilityOverrideRequest $request, ResourceService $resourceService)
+    public function store(StoreResourceAvailabilityOverrideRequest $request, Resource $resource, ResourceService $resourceService)
     {
-        $resourceAvailabilityOverride = ResourceAvailabilityOverride::create($request->validated());
+        $resourceAvailabilityOverride = $resource->availabilityOverrides()->create($request->validated());
 
         $resourceService->processOverride($resourceAvailabilityOverride);
 
