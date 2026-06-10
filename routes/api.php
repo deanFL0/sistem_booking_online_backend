@@ -17,13 +17,13 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     // Public routes (services and booking creation for everyone)
     // service routes
-    Route::get('/services', [ServiceController::class, 'index']);
-    Route::get('/services/{service}', [ServiceController::class, 'show']);
+    Route::get('/services', [ServiceController::class, 'index'])->middleware('throttle:public-content');
+    Route::get('/services/{service}', [ServiceController::class, 'show'])->middleware('throttle:public-content');
     // booking routes
-    Route::post('/bookings', [BookingController::class, 'store'])->middleware('throttle:booking');
-    Route::get('/guest-bookings/{token}', [BookingController::class, 'guestShow'])->whereUuid('token')->middleware('throttle:booking');
-    Route::post('/guest-bookings/{token}/cancel', [BookingController::class, 'guestCancel'])->whereUuid('token')->middleware('throttle:booking');
-    Route::patch('/guest-bookings/{token}/reschedule', [BookingController::class, 'guestReschedule'])->whereUuid('token')->middleware('throttle:booking');
+    Route::post('/bookings', [BookingController::class, 'store'])->middleware('throttle:booking-create');
+    Route::get('/guest-bookings/{token}', [BookingController::class, 'guestShow'])->whereUuid('token')->middleware('throttle:booking-lookup');
+    Route::post('/guest-bookings/{token}/cancel', [BookingController::class, 'guestCancel'])->whereUuid('token')->middleware('throttle:booking-modify');
+    Route::patch('/guest-bookings/{token}/reschedule', [BookingController::class, 'guestReschedule'])->whereUuid('token')->middleware('throttle:booking-modify');
 
     // auth routes (guest only)
     Route::middleware(['throttle:auth'])->group(function () {
