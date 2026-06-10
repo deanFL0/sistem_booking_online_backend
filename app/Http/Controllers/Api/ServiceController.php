@@ -21,13 +21,14 @@ class ServiceController extends Controller
             ->defaultSort('id')
             ->allowedSorts('id', 'name', 'price', 'pricing_type', 'duration', 'is_active')
             ->allowedFilters([
-                'name', 'price', 'pricing_type', 'duration', 'is_active',
+                'name', 'price', 'pricing_type', 'duration',
+                AllowedFilter::exact('is_active'),
                 AllowedFilter::scope('max_duration'),
                 AllowedFilter::scope('min_duration'),
                 AllowedFilter::scope('min_price'),
                 AllowedFilter::scope('max_price'),
             ])
-            ->paginate(25)
+            ->paginate(request('per_page', 10))
             ->appends(request()->query());
 
         return ServiceResource::collection($services);
