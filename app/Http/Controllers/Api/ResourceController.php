@@ -7,6 +7,8 @@ use App\Http\Requests\StoreResourceRequest;
 use App\Http\Requests\UpdateResourceRequest;
 use App\Http\Resources\ResourceResource;
 use App\Models\Resource;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedInclude;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class ResourceController extends Controller
@@ -17,10 +19,17 @@ class ResourceController extends Controller
     public function index()
     {
         $resource = QueryBuilder::for(Resource::class)
-            ->allowedIncludes('resource_type')
+            ->allowedIncludes([
+                AllowedInclude::relationship('resource_type', 'resourceType'),
+            ])
             ->defaultSort('id')
             ->allowedSorts('id', 'name', 'is_active')
-            ->allowedFilters('name', 'resource_type.name', 'is_active')
+            ->allowedFilters(
+                'name',
+                AllowedFilter::partial('resource_type_name', 'resourceType.name'),
+                AllowedFilter::exact('resource_type_id', 'resource_type_id'),
+                AllowedFilter::exact('is_active')
+            )
             ->paginate(request('per_page', 10))
             ->appends(request()->query());
 

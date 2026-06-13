@@ -25,7 +25,7 @@ class UpdateResourceRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|string|max:255',
-            'type' => 'sometimes|string|max:255',
+            'resource_type_id' => 'sometimes|exists:resource_types,id',
             'description' => 'nullable|string',
             'is_active' => 'sometimes|boolean',
         ];

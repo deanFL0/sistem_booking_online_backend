@@ -25,7 +25,7 @@ class StoreResourceRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'type' => 'required|string|max:255',
+            'resource_type_id' => 'required|exists:resource_types,id',
             'description' => 'nullable|string',
             'is_active' => 'required|boolean',
         ];
