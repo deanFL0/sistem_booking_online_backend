@@ -18,6 +18,7 @@ class UserController extends Controller
     public function index()
     {
         $users = QueryBuilder::for(User::class)
+            ->withTrashed()
             ->defaultSort('id')
             ->allowedSorts('id', 'name', 'email', 'role', 'created_at')
             ->allowedFilters([
