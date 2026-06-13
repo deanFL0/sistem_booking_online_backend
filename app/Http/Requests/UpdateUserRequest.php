@@ -27,7 +27,12 @@ class UpdateUserRequest extends FormRequest
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|unique:users,email,'.$this->route('user')->id,
             'phone' => 'nullable|string|max:20',
-            'password' => 'sometimes|string|min:8|confirmed',
+            'password' => [
+                'required',
+                'confirmed',
+                'min:8',
+                'regex:/^(?=.*[A-Za-z])(?=.*\d)/',
+            ],
         ];
     }
 }
