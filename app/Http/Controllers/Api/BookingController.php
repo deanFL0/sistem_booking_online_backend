@@ -55,7 +55,28 @@ class BookingController extends Controller
     {
         $user = auth()->user();
 
-        return BookingResource::collection(Booking::where('user_id', $user->id)->paginate(25));
+        $bookings = QueryBuilder::for(Booking::class)
+            ->where('user_id', $user->id)
+            ->defaultSort('id')
+            ->allowedSorts(
+                'id', 'customer_name', 'customer_email',
+                'start_datetime', 'end_datetime', 'duration_minutes',
+                'total_price', 'status'
+            )
+            ->allowedIncludes('service')
+            ->allowedFilters([
+                'customer_name', 'customer_email', 'customer_phone',
+                'start_datetime', 'end_datetime', 'duration_minutes',
+                'total_price', 'status', 'service.name',
+                AllowedFilter::scope('min_time'),
+                AllowedFilter::scope('max_time'),
+                AllowedFilter::scope('min_duration'),
+                AllowedFilter::scope('max_duration'),
+                AllowedFilter::scope('min_price'),
+                AllowedFilter::scope('max_price'),
+            ])
+            ->paginate(request('per_page', 10))
+            ->appends(request()->query());
     }
 
     /**
