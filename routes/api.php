@@ -45,6 +45,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('/resources', ResourceController::class);
 
         // resource type routes
+        Route::get('/resource-types/options', [ResourceTypeController::class, 'options']);
         Route::apiResource('/resource-types', ResourceTypeController::class);
 
         // service resource types routes

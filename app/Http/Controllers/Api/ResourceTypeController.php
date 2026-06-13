@@ -63,4 +63,15 @@ class ResourceTypeController extends Controller
 
         return response()->json(null, 204);
     }
+
+    /**
+     * Get all resource types.
+     * This is used for populating dropdowns in the frontend when creating or editing resources.
+     */
+    public function options()
+    {
+        return ResourceType::query()
+            ->orderBy('name')
+            ->get(['id', 'name']);
+    }
 }
