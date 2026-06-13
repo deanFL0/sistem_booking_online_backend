@@ -51,7 +51,7 @@ class ResourceController extends Controller
      */
     public function show(Resource $resource)
     {
-        $resource->load('resource_type', 'operational_hours', 'availability_overrides');
+        $resource->load('resourceType', 'operationalHours', 'availabilityOverrides');
 
         return new ResourceResource($resource);
     }
