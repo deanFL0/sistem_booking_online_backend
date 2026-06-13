@@ -19,17 +19,17 @@ class OperationalHourController extends Controller
     public function index(Resource $resource)
     {
         $operationalHour = QueryBuilder::for(OperationalHour::class)
-        ->where('resource_id', $resource->id)
-        ->defaultSort('id')
-        ->allowedSorts('id', 'day_of_week', 'open_time', 'close_time', 'is_closed')
-        ->allowedFilters([
-            'day_of_week', 'is_closed',
-            AllowedFilter::scope('min_time'),
-            AllowedFilter::scope('max_time'),
-        ])
-        ->paginate(25)
-        ->appends(request()->query());
-        
+            ->where('resource_id', $resource->id)
+            ->defaultSort('id')
+            ->allowedSorts('id', 'day_of_week', 'open_time', 'close_time', 'is_closed')
+            ->allowedFilters([
+                'day_of_week', 'is_closed',
+                AllowedFilter::scope('min_time'),
+                AllowedFilter::scope('max_time'),
+            ])
+            ->paginate(request('per_page', 10))
+            ->appends(request()->query());
+
         return new OperationalHourResource($operationalHour);
     }
 

@@ -21,7 +21,7 @@ class ResourceController extends Controller
             ->defaultSort('id')
             ->allowedSorts('id', 'name', 'is_active')
             ->allowedFilters('name', 'resource_type.name', 'is_active')
-            ->paginate(25)
+            ->paginate(request('per_page', 10))
             ->appends(request()->query());
 
         return ResourceResource::collection($resource);
@@ -43,6 +43,7 @@ class ResourceController extends Controller
     public function show(Resource $resource)
     {
         $resource->load('resource_type', 'operational_hours', 'availability_overrides');
+
         return new ResourceResource($resource);
     }
 

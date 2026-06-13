@@ -20,7 +20,7 @@ class ResourceTypeController extends Controller
             ->defaultSort('id')
             ->allowedSorts('id', 'name')
             ->allowedFilters('name')
-            ->paginate(25)
+            ->paginate(request('per_page', 10))
             ->appends(request()->query());
 
         return ResourceTypeResource::collection($resourceType);

@@ -27,7 +27,7 @@ class ResourceAvailabilityOverrideController extends Controller
                 AllowedFilter::scope('min_time'),
                 AllowedFilter::scope('max_time'),
             ])
-            ->paginate(25)
+            ->paginate(request('per_page', 10))
             ->appends(request()->query());
 
         return ResourceAvailabilityOverrideResource::collection($override);

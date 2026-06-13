@@ -25,7 +25,7 @@ class UserController extends Controller
                 AllowedFilter::scope('created_before'),
                 AllowedFilter::scope('created_after'),
             ])
-            ->paginate(25)
+            ->paginate(request('per_page', 10))
             ->appends(request()->query());
 
         return UserResource::collection($users);
