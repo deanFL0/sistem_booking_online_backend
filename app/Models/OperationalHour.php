@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,7 +27,17 @@ class OperationalHour extends Model
 
     public function getDayNameAttribute()
     {
-        return Carbon::create()->locale('id')->day($this->day_of_week)->dayName;
+        $names = [
+            'Minggu',
+            'Senin',
+            'Selasa',
+            'Rabu',
+            'Kamis',
+            'Jumat',
+            'Sabtu',
+        ];
+
+        return $names[$this->day_of_week] ?? null;
     }
 
     public function service()

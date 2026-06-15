@@ -27,7 +27,7 @@ class StoreBookingRequest extends FormRequest
             'service_id' => 'required|exists:services,id',
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'required|email|max:255',
-            'customer_phone' => 'required|string|max:20',
+            'customer_phone' => 'string|max:20',
             'start_datetime' => 'required|date',
         ];
     }

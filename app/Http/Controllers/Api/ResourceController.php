@@ -21,6 +21,8 @@ class ResourceController extends Controller
         $resource = QueryBuilder::for(Resource::class)
             ->allowedIncludes([
                 AllowedInclude::relationship('resource_type', 'resourceType'),
+                AllowedInclude::relationship('operational_hours', 'operationalHours'),
+                AllowedInclude::relationship('availability_overrides', 'availabilityOverrides'),
             ])
             ->defaultSort('id')
             ->allowedSorts('id', 'name', 'is_active')

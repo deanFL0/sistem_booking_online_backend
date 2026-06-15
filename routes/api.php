@@ -45,7 +45,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('/resources', ResourceController::class);
 
         // resource type routes
-        Route::get('/resource-types/options', [ResourceTypeController::class, 'options']);
         Route::apiResource('/resource-types', ResourceTypeController::class);
 
         // service resource types routes
@@ -69,10 +68,17 @@ Route::prefix('v1')->group(function () {
         });
 
         // bookings routes
-        Route::apiResource('/bookings', BookingController::class);
+        Route::apiResource('/bookings', BookingController::class)
+            ->except(['store']);
 
         // dashboard route
         Route::get('/dashboard', [DashboardController::class, 'index']);
+
+        // options routes
+        Route::prefix('options')->group(function () {
+            Route::get('/services', [ServiceController::class, 'options']);
+            Route::get('/resource-types', [ResourceTypeController::class, 'options']);
+        });
     });
 
     // routes for authenticated users

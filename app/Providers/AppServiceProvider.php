@@ -49,6 +49,10 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('booking-create', function (
             Request $request
         ) {
+            if ($request->user() && $request->user()->is_admin) {
+                return Limit::perMinute(20)->by($request->user()->id);
+            }
+
             if ($request->user()) {
                 return [
                     Limit::perMinute(3)->by($request->user()->id),

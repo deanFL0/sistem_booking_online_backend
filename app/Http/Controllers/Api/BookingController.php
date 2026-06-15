@@ -116,9 +116,12 @@ class BookingController extends Controller
             Carbon::parse($request->start_datetime),
         );
 
+        // Get user ID if authenticated, otherwise null for guest bookings
+        $userId = auth('sanctum')->check() ? auth('sanctum')->id() : null;
+
         // Create booking
         $booking = Booking::create([
-            'user_id' => auth('sanctum')->id(),
+            'user_id' => $userId,
             'service_id' => $data['service_id'],
             'customer_name' => $data['customer_name'],
             'customer_email' => $data['customer_email'],

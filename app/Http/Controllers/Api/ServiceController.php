@@ -71,4 +71,16 @@ class ServiceController extends Controller
 
         return response()->json(['message' => 'Service deleted successfully'], 200);
     }
+
+    /**
+     * Get all services.
+     * This is used for populating dropdowns or selection lists in the frontend.
+     */
+    public function options()
+    {
+        return Service::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+    }
 }
