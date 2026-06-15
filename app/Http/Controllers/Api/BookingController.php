@@ -32,13 +32,14 @@ class BookingController extends Controller
                 'start_datetime', 'end_datetime', 'duration_minutes',
                 'total_price', 'status'
             )
-            ->allowedIncludes('service')
+            ->allowedIncludes('service', 'resources', 'user')
             ->allowedFilters([
-                'customer_name', 'customer_email', 'customer_phone',
+                'booking_code', 'customer_name', 'customer_email', 'customer_phone',
                 'start_datetime', 'end_datetime', 'duration_minutes',
                 'total_price', 'status', 'service.name',
-                AllowedFilter::scope('min_time'),
-                AllowedFilter::scope('max_time'),
+                AllowedFilter::scope('min_start_datetime'),
+                AllowedFilter::scope('max_start_datetime'),
+                AllowedFilter::scope('max_end_datetime'),
                 AllowedFilter::scope('min_duration'),
                 AllowedFilter::scope('max_duration'),
                 AllowedFilter::scope('min_price'),

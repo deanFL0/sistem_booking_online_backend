@@ -76,12 +76,17 @@ class Booking extends Model
         return $this->belongsToMany(Resource::class);
     }
 
-    public function scopeMinStartTime($query, $minTime)
+    public function scopeMinStartDatetime($query, $minTime)
     {
         return $query->where('start_datetime', '>=', $minTime);
     }
 
-    public function scopeMaxEndTime($query, $maxTime)
+    public function scopeMaxStartDatetime($query, $maxTime)
+    {
+        return $query->where('start_datetime', '<=', $maxTime);
+    }
+
+    public function scopeMaxEndDatetime($query, $maxTime)
     {
         return $query->where('end_datetime', '<=', $maxTime);
     }

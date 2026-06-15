@@ -69,8 +69,7 @@ Route::prefix('v1')->group(function () {
         });
 
         // bookings routes
-        Route::apiResource('/bookings', BookingController::class)
-            ->except(['store']);
+        Route::apiResource('/bookings', BookingController::class);
 
         // dashboard route
         Route::get('/dashboard', [DashboardController::class, 'index']);
