@@ -178,9 +178,58 @@ class BookingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AdminUpdateBookingRequest $request, Booking $booking)
+    public function update(AdminUpdateBookingRequest $request, Booking $booking, BookingService $bookingService)
     {
-        $booking->update($request->validated());
+        $data = $request->validated();
+
+        // If admin only updates customer info (no service or start change), perform a simple update
+        $requiresFullValidation = array_key_exists('service_id', $data) || array_key_exists('start_datetime', $data);
+
+        if (! $requiresFullValidation) {
+            $booking->update($data);
+
+            return new BookingResource($booking);
+        }
+
+        // Determine new service and start values (fall back to existing booking values)
+        $serviceId = $data['service_id'] ?? $booking->service_id;
+        $start = isset($data['start_datetime'])
+            ? Carbon::parse($data['start_datetime'])
+            : Carbon::parse($booking->start_datetime);
+
+        // Validate reschedule rules (status/min-reschedule time)
+        $bookingService->validateBookingReschedule($booking, $start);
+
+        // Validate service availability, resources, and compute derived fields
+        $allocatedResources = $bookingService->getBookingResources($serviceId, $start);
+
+        $endDatetime = $bookingService->calculateEndDatetime($serviceId, $start);
+
+        // Get service duration and total price
+        $service = Service::findOrFail($serviceId);
+        $duration = $service->duration;
+        $totalPrice = $bookingService->calculateTotalPrice($serviceId);
+
+        // Merge computed fields into update payload
+        $updateData = array_merge($data, [
+            'service_id' => $serviceId,
+            'start_datetime' => $start->format('Y-m-d H:i:s'),
+            'end_datetime' => $endDatetime->format('Y-m-d H:i:s'),
+            'duration_minutes' => $duration,
+            'total_price' => $totalPrice,
+        ]);
+
+        $booking->update($updateData);
+
+        // Sync allocated resources
+        if ($allocatedResources && $allocatedResources->isNotEmpty()) {
+            $booking->resources()->sync($allocatedResources->pluck('id')->toArray());
+        } else {
+            $booking->resources()->detach();
+        }
+
+        // Notify customer about the change
+        Mail::to($booking->customer_email)->send(new BookingRescheduledMail($booking));
 
         return new BookingResource($booking);
     }
