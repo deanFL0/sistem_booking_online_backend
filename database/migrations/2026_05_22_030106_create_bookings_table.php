@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null'); // for logged in user
             $table->string('customer_name');
             $table->string('customer_email');
-            $table->string('customer_phone');
+            $table->string('customer_phone')->nullable();
             $table->dateTime('start_datetime'); // The time customer wants to book a service
             $table->dateTime('end_datetime')->nullable(); // Calculated finish time of the service
             $table->integer('duration_minutes')->default(0); // Service duration in minutes

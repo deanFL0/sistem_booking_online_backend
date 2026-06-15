@@ -125,7 +125,7 @@ class BookingController extends Controller
             'service_id' => $data['service_id'],
             'customer_name' => $data['customer_name'],
             'customer_email' => $data['customer_email'],
-            'customer_phone' => $data['customer_phone'],
+            'customer_phone' => $data['customer_phone'] ?? null,
             'start_datetime' => $data['start_datetime'],
             'end_datetime' => $endDatetime->format('Y-m-d H:i:s'),
             'duration_minutes' => $duration,
