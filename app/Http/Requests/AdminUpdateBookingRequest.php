@@ -12,7 +12,8 @@ class AdminUpdateBookingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Check if the user is an admin
+        return auth()->user()->role === 'admin';
     }
 
     /**
@@ -27,9 +28,9 @@ class AdminUpdateBookingRequest extends FormRequest
             'service_id' => 'sometimes|exists:services,id',
             'customer_name' => 'sometimes|string|max:255',
             'customer_email' => 'sometimes|email|max:255',
-            'customer_phone' => 'sometimes|string|max:20',
+            'customer_phone' => 'sometimes|nullable|string|max:20',
             'start_datetime' => 'sometimes|date',
-            'status' => 'sometimes|string|max:100',
+            'status' => 'sometimes|in:pending,confirmed,ongoing,cancelled,completed,no_show',
         ];
     }
 }
