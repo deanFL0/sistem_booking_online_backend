@@ -25,8 +25,10 @@ class ResourceAvailabilityOverrideController extends Controller
             ->allowedSorts('id', 'start_datetime', 'end_datetime', 'status')
             ->allowedFilters([
                 'start_datetime', 'end_datetime', 'status',
-                AllowedFilter::scope('min_datetime'),
-                AllowedFilter::scope('max_datetime'),
+                AllowedFilter::scope('min_start_datetime'),
+                AllowedFilter::scope('max_start_datetime'),
+                AllowedFilter::scope('min_end_datetime'),
+                AllowedFilter::scope('max_end_datetime'),
             ])
             ->paginate(request('per_page', 10))
             ->appends(request()->query());
