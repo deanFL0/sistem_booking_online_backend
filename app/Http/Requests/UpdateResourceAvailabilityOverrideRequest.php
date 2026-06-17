@@ -25,8 +25,8 @@ class UpdateResourceAvailabilityOverrideRequest extends FormRequest
     {
         return [
             'resource_id' => 'sometimes|exists:resources,id',
-            'start_time' => 'sometimes|date',
-            'end_time' => 'sometimes|date|after:start_time',
+            'start_datetime' => 'sometimes|date',
+            'end_datetime' => 'sometimes|date|after:start_datetime',
             'status' => 'sometimes|in:available,unavailable',
         ];
     }

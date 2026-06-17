@@ -22,11 +22,11 @@ class ResourceAvailabilityOverrideController extends Controller
     {
         $override = QueryBuilder::for(ResourceAvailabilityOverride::class)
             ->defaultSort('id')
-            ->allowedSorts('id', 'start_time', 'end_time', 'status')
+            ->allowedSorts('id', 'start_datetime', 'end_datetime', 'status')
             ->allowedFilters([
-                'start_time', 'end_time', 'status',
-                AllowedFilter::scope('min_time'),
-                AllowedFilter::scope('max_time'),
+                'start_datetime', 'end_datetime', 'status',
+                AllowedFilter::scope('min_datetime'),
+                AllowedFilter::scope('max_datetime'),
             ])
             ->paginate(request('per_page', 10))
             ->appends(request()->query());

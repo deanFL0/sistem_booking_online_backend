@@ -24,8 +24,8 @@ class ResourceAvailabilityOverrideFactory extends Factory
 
         return [
             'resource_id' => Resource::factory(),
-            'start_time' => sprintf('%s %02d:00:00', $date, $startHour),
-            'end_time' => sprintf('%s %02d:00:00', $date, $endHour),
+            'start_datetime' => sprintf('%s %02d:00:00', $date, $startHour),
+            'end_datetime' => sprintf('%s %02d:00:00', $date, $endHour),
             'status' => $this->faker->randomElement(['available', 'unavailable']),
         ];
     }

@@ -212,8 +212,8 @@ class AvailabilityService
                 ->with([
                     'operationalHours',
                     'availabilityOverrides' => function ($query) use ($rangeStart, $rangeEnd) {
-                        $query->where('start_time', '<', $rangeEnd)
-                            ->where('end_time', '>', $rangeStart);
+                        $query->where('start_datetime', '<', $rangeEnd)
+                            ->where('end_datetime', '>', $rangeStart);
                     },
                     'bookings' => function ($query) use ($rangeStart, $rangeEnd) {
                         $query->whereNotIn('bookings.status', ['cancelled', 'completed'])
@@ -261,7 +261,7 @@ class AvailabilityService
         }
 
         $overrides = collect($resource->availabilityOverrides)->filter(function ($override) use ($start, $end) {
-            return $override->start_time < $end && $override->end_time > $start;
+            return $override->start_datetime < $end && $override->end_datetime > $start;
         });
 
         if ($overrides->contains(function ($override) {

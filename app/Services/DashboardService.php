@@ -133,13 +133,13 @@ class DashboardService
 
         return ResourceAvailabilityOverride::query()
             ->with('resource:id,name')
-            ->where('start_time', '<=', $end)
-            ->where('end_time', '>=', $today)
-            ->orderBy('start_time')
+            ->where('start_datetime', '<=', $end)
+            ->where('end_datetime', '>=', $today)
+            ->orderBy('start_datetime')
             ->get()
             ->map(function ($item) {
-                $start = Carbon::parse($item->start_time);
-                $end = Carbon::parse($item->end_time);
+                $start = Carbon::parse($item->start_datetime);
+                $end = Carbon::parse($item->end_datetime);
                 $now = Carbon::now();
 
                 // Day label

@@ -14,14 +14,14 @@ class ResourceAvailabilityOverride extends Model
 
     protected $fillable = [
         'resource_id',
-        'start_time',
-        'end_time',
+        'start_datetime',
+        'end_datetime',
         'status',
     ];
 
     protected $casts = [
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
+        'start_datetime' => 'datetime',
+        'end_datetime' => 'datetime',
     ];
 
     public function resource()
@@ -31,17 +31,17 @@ class ResourceAvailabilityOverride extends Model
 
     public function scopeMinTime($query, $minTime)
     {
-        return $query->where('start_time', '>=', $minTime);
+        return $query->where('start_datetime', '>=', $minTime);
     }
 
     public function scopeMaxTime($query, $maxTime)
     {
-        return $query->where('end_time', '<=', $maxTime);
+        return $query->where('end_datetime', '<=', $maxTime);
     }
 
     public function scopeOnDay($query, $date)
     {
-        return $query->where('start_time', '<', Carbon::parse($date)->endOfDay())
-            ->where('end_time', '>', Carbon::parse($date)->startOfDay());
+        return $query->where('start_datetime', '<', Carbon::parse($date)->endOfDay())
+            ->where('end_datetime', '>', Carbon::parse($date)->startOfDay());
     }
 }
