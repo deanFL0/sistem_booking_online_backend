@@ -81,6 +81,8 @@ class BookingController extends Controller
             ])
             ->paginate(request('per_page', 10))
             ->appends(request()->query());
+
+        return BookingResource::collection($bookings);
     }
 
     /**

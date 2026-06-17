@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AvailableDatesRequest;
+use App\Http\Requests\AvailableTimeSlotsRequest;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use App\Http\Resources\ServiceResource;
 use App\Models\Service;
+use App\Services\AvailabilityService;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -82,5 +85,43 @@ class ServiceController extends Controller
             ->where('is_active', true)
             ->orderBy('name')
             ->get(['id', 'name']);
+    }
+
+    public function availableDates(
+        AvailableDatesRequest $request,
+        Service $service,
+        AvailabilityService $availabilityService
+    ) {
+        $startDate = $request->input('start_date', now()->format('Y-m-d'));
+        $bookingWindowDays = (int) setting('booking_window_days', 90);
+        $stepMinutes = (int) setting('slot_step_minutes', 30);
+
+        $availableDates = $availabilityService->getAvailableDates(
+            $service->id,
+            $startDate
+        );
+
+        return response()->json([
+            'service_id' => $service->id,
+            'start_date' => $startDate,
+            'available_dates' => $availableDates,
+        ]);
+    }
+
+    public function availableTimeSlots(
+        AvailableTimeSlotsRequest $request,
+        Service $service,
+        AvailabilityService $availabilityService
+    ) {
+        $availableSlots = $availabilityService->getAvailableTimeSlots(
+            $service->id,
+            $request->input('date')
+        );
+
+        return response()->json([
+            'service_id' => $service->id,
+            'date' => $request->input('date'),
+            'available_time_slots' => $availableSlots,
+        ]);
     }
 }

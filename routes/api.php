@@ -21,6 +21,8 @@ Route::prefix('v1')->group(function () {
     Route::get('/services/{service}', [ServiceController::class, 'show'])->middleware('throttle:public-content');
     // booking routes
     Route::post('/bookings', [BookingController::class, 'store'])->middleware('throttle:booking-create');
+    Route::get('/services/{service}/available-dates', [ServiceController::class, 'availableDates'])->middleware('throttle:public-content');
+    Route::get('/services/{service}/available-time-slots', [ServiceController::class, 'availableTimeSlots'])->middleware('throttle:public-content');
     Route::get('/guest-bookings/{token}', [BookingController::class, 'guestShow'])->whereUuid('token')->middleware('throttle:booking-lookup');
     Route::post('/guest-bookings/{token}/cancel', [BookingController::class, 'guestCancel'])->whereUuid('token')->middleware('throttle:booking-modify');
     Route::patch('/guest-bookings/{token}/reschedule', [BookingController::class, 'guestReschedule'])->whereUuid('token')->middleware('throttle:booking-modify');
