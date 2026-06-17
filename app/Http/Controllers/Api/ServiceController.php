@@ -58,9 +58,11 @@ class ServiceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateServiceRequest $request, Service $service)
+    public function update(UpdateServiceRequest $request, Service $service, AvailabilityService $availabilityService)
     {
         $service->update($request->validated());
+
+        $availabilityService->invalidateServiceAvailability($service->id);
 
         return new ServiceResource($service);
     }
@@ -68,8 +70,9 @@ class ServiceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Service $service)
+    public function destroy(Service $service, AvailabilityService $availabilityService)
     {
+        $availabilityService->invalidateServiceAvailability($service->id);
         $service->delete();
 
         return response()->json(['message' => 'Service deleted successfully'], 200);
@@ -93,8 +96,6 @@ class ServiceController extends Controller
         AvailabilityService $availabilityService
     ) {
         $startDate = $request->input('start_date', now()->format('Y-m-d'));
-        $bookingWindowDays = (int) setting('booking_window_days', 90);
-        $stepMinutes = (int) setting('slot_step_minutes', 30);
 
         $availableDates = $availabilityService->getAvailableDates(
             $service->id,

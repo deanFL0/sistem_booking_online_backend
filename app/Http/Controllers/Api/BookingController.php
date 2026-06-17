@@ -12,6 +12,7 @@ use App\Mail\BookingCreatedMail;
 use App\Mail\BookingRescheduledMail;
 use App\Models\Booking;
 use App\Models\Service;
+use App\Services\AvailabilityService;
 use App\Services\BookingService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -57,7 +58,7 @@ class BookingController extends Controller
     // Display list of bookings for the authenticated user
     public function myBookings()
     {
-        $user = auth()->user();
+        $user = auth('sanctum')->user();
 
         $bookings = QueryBuilder::for(Booking::class)
             ->where('user_id', $user->id)
@@ -96,7 +97,7 @@ class BookingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreBookingRequest $request, BookingService $bookingService)
+    public function store(StoreBookingRequest $request, BookingService $bookingService, AvailabilityService $availabilityService)
     {
         $data = $request->validated();
 
@@ -146,6 +147,8 @@ class BookingController extends Controller
         // Send booking confirmation email to the customer
         Mail::to($booking->customer_email)->send(new BookingCreatedMail($booking));
 
+        $availabilityService->invalidateServiceAvailability($booking->service_id);
+
         return new BookingResource($booking);
     }
 
@@ -180,7 +183,7 @@ class BookingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AdminUpdateBookingRequest $request, Booking $booking, BookingService $bookingService)
+    public function update(AdminUpdateBookingRequest $request, Booking $booking, BookingService $bookingService, AvailabilityService $availabilityService)
     {
         $data = $request->validated();
 
@@ -230,13 +233,21 @@ class BookingController extends Controller
             $booking->resources()->detach();
         }
 
+        // Invalidate availability for both previous and updated services, if changed.
+        $oldServiceId = $booking->wasChanged('service_id') ? $booking->getOriginal('service_id') : $booking->service_id;
+        $availabilityService->invalidateServiceAvailability($booking->service_id);
+
+        if (isset($oldServiceId) && $oldServiceId !== $booking->service_id) {
+            $availabilityService->invalidateServiceAvailability($oldServiceId);
+        }
+
         // Notify customer about the change
         Mail::to($booking->customer_email)->send(new BookingRescheduledMail($booking));
 
         return new BookingResource($booking);
     }
 
-    public function reschedule(RescheduleBookingRequest $request, Booking $booking, BookingService $bookingService)
+    public function reschedule(RescheduleBookingRequest $request, Booking $booking, BookingService $bookingService, AvailabilityService $availabilityService)
     {
         $request->validated();
 
@@ -247,13 +258,15 @@ class BookingController extends Controller
 
         $booking->update($request->validated());
 
+        $availabilityService->invalidateServiceAvailability($booking->service_id);
+
         // Send booking confirmation email to the customer
         Mail::to($booking->customer_email)->send(new BookingRescheduledMail($booking));
 
         return new BookingResource($booking);
     }
 
-    public function guestReschedule(RescheduleBookingRequest $request, $token, BookingService $bookingService)
+    public function guestReschedule(RescheduleBookingRequest $request, $token, BookingService $bookingService, AvailabilityService $availabilityService)
     {
         $request->validated();
 
@@ -266,17 +279,21 @@ class BookingController extends Controller
 
         $booking->update($request->validated());
 
+        $availabilityService->invalidateServiceAvailability($booking->service_id);
+
         // Send booking confirmation email to the customer
         Mail::to($booking->customer_email)->send(new BookingRescheduledMail($booking));
 
         return new BookingResource($booking);
     }
 
-    public function cancel(Booking $booking, BookingService $bookingService)
+    public function cancel(Booking $booking, BookingService $bookingService, AvailabilityService $availabilityService)
     {
         $bookingService->validateBookingCancellation($booking);
 
         $booking->update(['status' => 'cancelled']);
+
+        $availabilityService->invalidateServiceAvailability($booking->service_id);
 
         // Send booking confirmation email to the customer
         Mail::to($booking->customer_email)->send(new BookingCancelledMail($booking));
@@ -284,13 +301,15 @@ class BookingController extends Controller
         return new BookingResource($booking);
     }
 
-    public function guestCancel($token, BookingService $bookingService)
+    public function guestCancel($token, BookingService $bookingService, AvailabilityService $availabilityService)
     {
         $booking = Booking::where('manage_token', $token)->firstOrFail();
 
         $bookingService->validateBookingCancellation($booking);
 
         $booking->update(['status' => 'cancelled']);
+
+        $availabilityService->invalidateServiceAvailability($booking->service_id);
 
         // Send booking confirmation email to the customer
         Mail::to($booking->customer_email)->send(new BookingCancelledMail($booking));
@@ -301,9 +320,12 @@ class BookingController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Booking $booking)
+    public function destroy(Booking $booking, AvailabilityService $availabilityService)
     {
+        $serviceId = $booking->service_id;
         $booking->delete();
+
+        $availabilityService->invalidateServiceAvailability($serviceId);
 
         return response()->json(['message' => 'Booking deleted successfully'], 200);
     }

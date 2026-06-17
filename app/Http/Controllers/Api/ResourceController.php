@@ -7,6 +7,7 @@ use App\Http\Requests\StoreResourceRequest;
 use App\Http\Requests\UpdateResourceRequest;
 use App\Http\Resources\ResourceResource;
 use App\Models\Resource;
+use App\Services\AvailabilityService;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedInclude;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -41,9 +42,11 @@ class ResourceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreResourceRequest $request)
+    public function store(StoreResourceRequest $request, AvailabilityService $availabilityService)
     {
         $resource = Resource::create($request->validated());
+
+        $availabilityService->invalidateServicesByResource($resource);
 
         return (new ResourceResource($resource))->response()->setStatusCode(201);
     }
@@ -61,9 +64,11 @@ class ResourceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateResourceRequest $request, Resource $resource)
+    public function update(UpdateResourceRequest $request, Resource $resource, AvailabilityService $availabilityService)
     {
         $resource->update($request->validated());
+
+        $availabilityService->invalidateServicesByResource($resource);
 
         return new ResourceResource($resource);
     }
@@ -71,8 +76,9 @@ class ResourceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Resource $resource)
+    public function destroy(Resource $resource, AvailabilityService $availabilityService)
     {
+        $availabilityService->invalidateServicesByResource($resource);
         $resource->delete();
 
         return response()->json(['message' => 'Resource deleted successfully'], 200);

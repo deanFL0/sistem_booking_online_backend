@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateResourceAvailabilityOverrideRequest;
 use App\Http\Resources\ResourceAvailabilityOverrideResource;
 use App\Models\Resource;
 use App\Models\ResourceAvailabilityOverride;
+use App\Services\AvailabilityService;
 use App\Services\ResourceService;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -44,11 +45,12 @@ class ResourceAvailabilityOverrideController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreResourceAvailabilityOverrideRequest $request, Resource $resource, ResourceService $resourceService)
+    public function store(StoreResourceAvailabilityOverrideRequest $request, Resource $resource, ResourceService $resourceService, AvailabilityService $availabilityService)
     {
         $resourceAvailabilityOverride = $resource->availabilityOverrides()->create($request->validated());
 
         $resourceService->processOverride($resourceAvailabilityOverride);
+        $availabilityService->invalidateServicesByResource($resource);
 
         return (new ResourceAvailabilityOverrideResource(
             $resourceAvailabilityOverride
@@ -74,11 +76,12 @@ class ResourceAvailabilityOverrideController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateResourceAvailabilityOverrideRequest $request, ResourceAvailabilityOverride $resourceAvailabilityOverride, ResourceService $resourceService)
+    public function update(UpdateResourceAvailabilityOverrideRequest $request, ResourceAvailabilityOverride $resourceAvailabilityOverride, ResourceService $resourceService, AvailabilityService $availabilityService)
     {
         $resourceAvailabilityOverride->update($request->validated());
 
         $resourceService->processOverride($resourceAvailabilityOverride);
+        $availabilityService->invalidateServicesByResource($resourceAvailabilityOverride->resource);
 
         return new ResourceAvailabilityOverrideResource($resourceAvailabilityOverride);
     }
@@ -86,9 +89,14 @@ class ResourceAvailabilityOverrideController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ResourceAvailabilityOverride $resourceAvailabilityOverride)
+    public function destroy(ResourceAvailabilityOverride $resourceAvailabilityOverride, AvailabilityService $availabilityService)
     {
+        $resource = $resourceAvailabilityOverride->resource;
         $resourceAvailabilityOverride->delete();
+
+        if ($resource) {
+            $availabilityService->invalidateServicesByResource($resource);
+        }
 
         return response()->json(['message' => 'Resource availability override deleted successfully'], 200);
     }

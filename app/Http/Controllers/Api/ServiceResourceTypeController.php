@@ -9,6 +9,7 @@ use App\Http\Resources\ResourceTypeResource;
 use App\Models\ResourceType;
 use App\Models\Service;
 use App\QueryBuilder\ServiceResourceTypeQuery;
+use App\Services\AvailabilityService;
 
 class ServiceResourceTypeController extends Controller
 {
@@ -27,7 +28,7 @@ class ServiceResourceTypeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreServiceResourceTypeRequest $request, Service $service)
+    public function store(StoreServiceResourceTypeRequest $request, Service $service, AvailabilityService $availabilityService)
     {
         $data = $request->validated();
 
@@ -35,18 +36,22 @@ class ServiceResourceTypeController extends Controller
         $service->resourceTypes()
             ->syncWithoutDetaching([$data['resource_type_id'] => ['quantity' => $data['quantity']]]);
 
+        $availabilityService->invalidateServiceAvailability($service->id);
+
         return response()->json(['message' => 'Resource type assigned successfully']);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateServiceResourceTypeRequest $request, Service $service, ResourceType $resourceType)
+    public function update(UpdateServiceResourceTypeRequest $request, Service $service, ResourceType $resourceType, AvailabilityService $availabilityService)
     {
         $data = $request->validated();
 
         // update the quantity of the resource type for the service
         $service->resourceTypes()->updateExistingPivot($data['resource_type_id'], ['quantity' => $data['quantity']]);
+
+        $availabilityService->invalidateServiceAvailability($service->id);
 
         return response()->json(['message' => 'Quantity updated successfully']);
     }
@@ -54,10 +59,12 @@ class ServiceResourceTypeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Service $service, ResourceType $resourceType)
+    public function destroy(Service $service, ResourceType $resourceType, AvailabilityService $availabilityService)
     {
         // detach resource type from service
         $service->resourceTypes()->detach($resourceType->id);
+
+        $availabilityService->invalidateServiceAvailability($service->id);
 
         return response()->json(['message' => 'Resource type unassigned successfully']);
     }

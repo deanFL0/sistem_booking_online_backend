@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateOperationalHourRequest;
 use App\Http\Resources\OperationalHourResource;
 use App\Models\OperationalHour;
 use App\Models\Resource;
+use App\Services\AvailabilityService;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -44,9 +45,11 @@ class OperationalHourController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreOperationalHourRequest $request, Resource $resource)
+    public function store(StoreOperationalHourRequest $request, Resource $resource, AvailabilityService $availabilityService)
     {
         $operationalHour = $resource->operationalHours()->create($request->validated());
+
+        $availabilityService->invalidateServicesByResource($resource);
 
         return (new OperationalHourResource($operationalHour))->response()->setStatusCode(201);
     }
@@ -70,9 +73,11 @@ class OperationalHourController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateOperationalHourRequest $request, Resource $resource, OperationalHour $operationalHour)
+    public function update(UpdateOperationalHourRequest $request, Resource $resource, OperationalHour $operationalHour, AvailabilityService $availabilityService)
     {
         $operationalHour->update($request->validated());
+
+        $availabilityService->invalidateServicesByResource($resource);
 
         return new OperationalHourResource($operationalHour);
     }
@@ -80,9 +85,11 @@ class OperationalHourController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Resource $resource, OperationalHour $operationalHour)
+    public function destroy(Resource $resource, OperationalHour $operationalHour, AvailabilityService $availabilityService)
     {
         $operationalHour->delete();
+
+        $availabilityService->invalidateServicesByResource($resource);
 
         return response()->json('Operational hour deleted successfully', 200);
     }
