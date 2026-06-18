@@ -49,7 +49,10 @@ class ServiceResourceTypeController extends Controller
         $data = $request->validated();
 
         // update the quantity of the resource type for the service
-        $service->resourceTypes()->updateExistingPivot($data['resource_type_id'], ['quantity' => $data['quantity']]);
+        $service->resourceTypes()->updateExistingPivot(
+            $resourceType->id,
+            ['quantity' => $data['quantity']]
+        );
 
         $availabilityService->invalidateServiceAvailability($service->id);
 

@@ -21,6 +21,7 @@ class ServiceController extends Controller
     public function index()
     {
         $services = QueryBuilder::for(Service::class)
+            ->allowedIncludes('resourceTypes')
             ->defaultSort('id')
             ->allowedSorts('id', 'name', 'price', 'pricing_type', 'duration', 'is_active')
             ->allowedFilters([
@@ -52,6 +53,8 @@ class ServiceController extends Controller
      */
     public function show(Service $service)
     {
+        $service->load('resourceTypes');
+
         return new ServiceResource($service);
     }
 
