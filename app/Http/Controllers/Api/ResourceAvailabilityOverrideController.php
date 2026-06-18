@@ -49,28 +49,28 @@ class ResourceAvailabilityOverrideController extends Controller
      */
     public function store(StoreResourceAvailabilityOverrideRequest $request, Resource $resource, ResourceService $resourceService, AvailabilityService $availabilityService)
     {
-        $resourceAvailabilityOverride = $resource->availabilityOverrides()->create($request->validated());
+        $availabilityOverride = $resource->availabilityOverrides()->create($request->validated());
 
-        $resourceService->processOverride($resourceAvailabilityOverride);
+        $resourceService->processOverride($availabilityOverride);
         $availabilityService->invalidateServicesByResource($resource);
 
         return (new ResourceAvailabilityOverrideResource(
-            $resourceAvailabilityOverride
+            $availabilityOverride
         ))->response()->setStatusCode(201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(ResourceAvailabilityOverride $resourceAvailabilityOverride)
+    public function show(Resource $resource, ResourceAvailabilityOverride $availabilityOverride)
     {
-        return new ResourceAvailabilityOverrideResource($resourceAvailabilityOverride);
+        return new ResourceAvailabilityOverrideResource($availabilityOverride);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ResourceAvailabilityOverride $resourceAvailabilityOverride)
+    public function edit(ResourceAvailabilityOverride $availabilityOverride)
     {
         //
     }
@@ -78,23 +78,22 @@ class ResourceAvailabilityOverrideController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateResourceAvailabilityOverrideRequest $request, ResourceAvailabilityOverride $resourceAvailabilityOverride, ResourceService $resourceService, AvailabilityService $availabilityService)
+    public function update(UpdateResourceAvailabilityOverrideRequest $request, Resource $resource, ResourceAvailabilityOverride $availabilityOverride, ResourceService $resourceService, AvailabilityService $availabilityService)
     {
-        $resourceAvailabilityOverride->update($request->validated());
+        $availabilityOverride->update($request->validated());
 
-        $resourceService->processOverride($resourceAvailabilityOverride);
-        $availabilityService->invalidateServicesByResource($resourceAvailabilityOverride->resource);
+        $resourceService->processOverride($availabilityOverride);
+        $availabilityService->invalidateServicesByResource($availabilityOverride->resource);
 
-        return new ResourceAvailabilityOverrideResource($resourceAvailabilityOverride);
+        return new ResourceAvailabilityOverrideResource($availabilityOverride);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ResourceAvailabilityOverride $resourceAvailabilityOverride, AvailabilityService $availabilityService)
+    public function destroy(Resource $resource, ResourceAvailabilityOverride $availabilityOverride, AvailabilityService $availabilityService)
     {
-        $resource = $resourceAvailabilityOverride->resource;
-        $resourceAvailabilityOverride->delete();
+        $availabilityOverride->delete();
 
         if ($resource) {
             $availabilityService->invalidateServicesByResource($resource);

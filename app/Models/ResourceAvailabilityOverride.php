@@ -17,6 +17,7 @@ class ResourceAvailabilityOverride extends Model
         'start_datetime',
         'end_datetime',
         'status',
+        'reason',
     ];
 
     protected $casts = [

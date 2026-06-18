@@ -27,6 +27,7 @@ class StoreResourceAvailabilityOverrideRequest extends FormRequest
             'start_datetime' => 'required|date',
             'end_datetime' => 'required|date|after:start_datetime',
             'status' => 'required|in:available,unavailable',
+            'reason' => 'sometimes|string|max:255',
         ];
     }
 }

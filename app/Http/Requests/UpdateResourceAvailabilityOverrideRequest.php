@@ -28,6 +28,7 @@ class UpdateResourceAvailabilityOverrideRequest extends FormRequest
             'start_datetime' => 'sometimes|date',
             'end_datetime' => 'sometimes|date|after:start_datetime',
             'status' => 'sometimes|in:available,unavailable',
+            'reason' => 'sometimes|string|max:255',
         ];
     }
 }
