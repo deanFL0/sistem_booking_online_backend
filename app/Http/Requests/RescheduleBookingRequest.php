@@ -13,26 +13,43 @@ class RescheduleBookingRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        // Admin bypass
+        if (auth()->check() && auth()->user()->role === 'admin') {
+            return true;
+        }
+
         $token = $this->route('token');
 
-        $booking = Booking::where('manage_token', $token)->first();
+        // Guest-management route
+        if ($token) {
+            $booking = Booking::where('manage_token', $token)->first();
+
+            if (! $booking) {
+                return false;
+            }
+
+            $this->merge([
+                'guest_booking' => $booking,
+            ]);
+
+            // Logged-in customer accessing their own booking
+            if (auth()->check()) {
+                return $booking->user_id === auth()->id();
+            }
+
+            // Guest access
+            return true;
+        }
+
+        // Authenticated booking route: /bookings/{booking}/...
+        $booking = $this->route('booking');
 
         if (! $booking) {
             return false;
         }
 
-        // Store for later if needed
-        $this->merge([
-            'guest_booking' => $booking,
-        ]);
-
-        // Authenticated owner
-        if (auth()->check()) {
-            return $booking->user_id === auth()->id();
-        }
-
-        // Guest access via token
-        return true;
+        return auth()->check()
+            && $booking->user_id === auth()->id();
     }
 
     /**
