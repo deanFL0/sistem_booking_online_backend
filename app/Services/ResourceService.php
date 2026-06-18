@@ -23,7 +23,8 @@ class ResourceService
     public function validateResourceAvailability(
         int $resourceId,
         Carbon $start,
-        Carbon $end
+        Carbon $end,
+        ?int $ignoreBookingId = null
     ) {
 
         $resource = Resource::findOrFail($resourceId);
@@ -163,6 +164,9 @@ class ResourceService
                 'cancelled',
                 'completed',
             ])
+            ->when($ignoreBookingId !== null, function ($query) use ($ignoreBookingId) {
+                $query->where('bookings.id', '<>', $ignoreBookingId);
+            })
             ->where('bookings.start_datetime', '<', $end)
             ->where('bookings.end_datetime', '>', $start)
             ->exists();
@@ -184,8 +188,9 @@ class ResourceService
     public function processOverride(
         ResourceAvailabilityOverride $override
     ): void {
-        // Skip if override makes resource available
         if ($override->status === 'available') {
+            $this->resolveOverrideConflicts($override);
+
             return;
         }
 
@@ -240,6 +245,53 @@ class ResourceService
                     $override
                 )
             );
+        }
+
+        $this->resolveOverrideConflicts($override, false);
+    }
+
+    /**
+     * Attempt to clear booking conflicts for bookings affected by an override.
+     */
+    public function resolveOverrideConflicts(
+        ResourceAvailabilityOverride $override,
+        bool $saveIfResolved = true
+    ): void {
+        $overrideStart = Carbon::parse($override->start_datetime);
+        $overrideEnd = Carbon::parse($override->end_datetime);
+
+        $affectedBookings = Booking::with('resources')
+            ->whereHas('resources', function ($query) use ($override) {
+                $query->where('resources.id', $override->resource_id);
+            })
+            ->whereNotIn('status', ['cancelled', 'completed'])
+            ->where('start_datetime', '<', $overrideEnd)
+            ->where('end_datetime', '>', $overrideStart)
+            ->where('has_conflict', true)
+            ->get();
+
+        foreach ($affectedBookings as $booking) {
+            $bookingStillConflicted = false;
+
+            foreach ($booking->resources as $resource) {
+                try {
+                    $this->validateResourceAvailability(
+                        $resource->id,
+                        $booking->start_datetime,
+                        $booking->end_datetime,
+                        $booking->id
+                    );
+                } catch (ValidationException $e) {
+                    $bookingStillConflicted = true;
+                    break;
+                }
+            }
+
+            if (! $bookingStillConflicted && $saveIfResolved) {
+                $booking->has_conflict = false;
+                $booking->conflict_details = null;
+                $booking->save();
+            }
         }
     }
 }

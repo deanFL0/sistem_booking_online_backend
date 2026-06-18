@@ -31,6 +31,8 @@ class AdminUpdateBookingRequest extends FormRequest
             'customer_phone' => 'sometimes|nullable|string|max:20',
             'start_datetime' => 'sometimes|date',
             'status' => 'sometimes|in:pending,confirmed,ongoing,cancelled,completed,no_show',
+            'has_conflict' => 'sometimes|boolean',
+            'conflict_details' => 'sometimes|nullable|string',
         ];
     }
 }

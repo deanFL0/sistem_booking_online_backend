@@ -91,9 +91,10 @@ class ResourceAvailabilityOverrideController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Resource $resource, ResourceAvailabilityOverride $availabilityOverride, AvailabilityService $availabilityService)
+    public function destroy(Resource $resource, ResourceAvailabilityOverride $availabilityOverride, ResourceService $resourceService, AvailabilityService $availabilityService)
     {
         $availabilityOverride->delete();
+        $resourceService->resolveOverrideConflicts($availabilityOverride);
 
         if ($resource) {
             $availabilityService->invalidateServicesByResource($resource);

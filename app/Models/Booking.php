@@ -25,12 +25,15 @@ class Booking extends Model
         'status',
         'completion_notified_at',
         'manage_token',
+        'has_conflict',
+        'conflict_details',
     ];
 
     protected $casts = [
         'start_datetime' => 'datetime',
         'end_datetime' => 'datetime',
         'duration_minutes' => 'integer',
+        'has_conflict' => 'boolean',
     ];
 
     protected static function booted()
@@ -42,6 +45,22 @@ class Booking extends Model
             // Generate token for guest users to manage their bookings
             if (! $booking->user_id) {
                 $booking->manage_token = Str::uuid();
+            }
+        });
+
+        // Clear conflicts automatically when booking is cancelled/completed
+        // or when its datetime/service changes (reschedule/update).
+        static::updating(function ($booking) {
+            // If status changed to cancelled or completed, clear conflict
+            if ($booking->isDirty('status') && in_array($booking->status, ['cancelled', 'completed'], true)) {
+                $booking->has_conflict = false;
+            }
+
+            // If start/end datetime or service_id changed (reschedule/update), clear conflict
+            if ($booking->isDirty('start_datetime') || $booking->isDirty('service_id')) {
+                $booking->has_conflict = false;
+                // preserve existing conflict_details? we clear to indicate resolution or re-evaluation
+                $booking->conflict_details = null;
             }
         });
     }
