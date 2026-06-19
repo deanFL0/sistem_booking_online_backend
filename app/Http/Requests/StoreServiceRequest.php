@@ -26,6 +26,7 @@ class StoreServiceRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
             'price' => 'required|numeric|min:0',
             'pricing_type' => 'required|in:one_time,hourly',
             'duration' => 'required|numeric|min:0',

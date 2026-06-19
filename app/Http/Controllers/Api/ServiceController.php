@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateServiceRequest;
 use App\Http\Resources\ServiceResource;
 use App\Models\Service;
 use App\Services\AvailabilityService;
+use Illuminate\Support\Facades\Storage;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -43,7 +44,13 @@ class ServiceController extends Controller
      */
     public function store(StoreServiceRequest $request)
     {
-        $service = Service::create($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $data['image_path'] = $request->file('image')->store('services', 'public');
+        }
+
+        $service = Service::create($data);
 
         return (new ServiceResource($service))->response()->setStatusCode(201);
     }
@@ -63,8 +70,17 @@ class ServiceController extends Controller
      */
     public function update(UpdateServiceRequest $request, Service $service, AvailabilityService $availabilityService)
     {
-        $service->update($request->validated());
+        $data = $request->validated();
 
+        if ($request->hasFile('image')) {
+            // Delete the old image if it exists
+            if ($service->image_path) {
+                Storage::disk('public')->delete($service->image_path);
+            }
+            $data['image_path'] = $request->file('image')->store('services', 'public');
+        }
+
+        $service->update($data);
         $availabilityService->invalidateServiceAvailability($service->id);
 
         return new ServiceResource($service);
@@ -75,6 +91,11 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service, AvailabilityService $availabilityService)
     {
+        // Delete image if it exists
+        if ($service->image_path) {
+            Storage::disk('public')->delete($service->image_path);
+        }
+
         $availabilityService->invalidateServiceAvailability($service->id);
         $service->delete();
 

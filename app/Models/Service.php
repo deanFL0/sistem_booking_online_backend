@@ -12,6 +12,7 @@ class Service extends Model
     protected $fillable = [
         'name',
         'description',
+        'image_path',
         'price',
         'pricing_type',
         'duration',

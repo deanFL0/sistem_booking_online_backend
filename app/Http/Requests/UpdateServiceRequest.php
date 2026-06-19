@@ -26,6 +26,7 @@ class UpdateServiceRequest extends FormRequest
         return [
             'name' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
             'price' => 'sometimes|numeric|min:0',
             'pricing_type' => 'sometimes|in:one_time,hourly',
             'duration' => 'sometimes|numeric|min:0',
