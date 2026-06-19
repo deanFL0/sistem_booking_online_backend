@@ -9,9 +9,11 @@ use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use App\Http\Resources\ServiceResource;
 use App\Models\Service;
+use App\QueryBuilder\ServiceTotalPriceSort;
 use App\Services\AvailabilityService;
 use Illuminate\Support\Facades\Storage;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class ServiceController extends Controller
@@ -24,7 +26,10 @@ class ServiceController extends Controller
         $services = QueryBuilder::for(Service::class)
             ->allowedIncludes('resourceTypes')
             ->defaultSort('id')
-            ->allowedSorts('id', 'name', 'price', 'pricing_type', 'duration', 'is_active')
+            ->allowedSorts([
+                'id', 'name', 'price', 'pricing_type', 'duration', 'is_active',
+                AllowedSort::custom('total_price', new ServiceTotalPriceSort()),
+            ])
             ->allowedFilters([
                 'name', 'price', 'pricing_type', 'duration',
                 AllowedFilter::exact('is_active'),
@@ -32,6 +37,8 @@ class ServiceController extends Controller
                 AllowedFilter::scope('min_duration'),
                 AllowedFilter::scope('min_price'),
                 AllowedFilter::scope('max_price'),
+                AllowedFilter::scope('min_total_price'),
+                AllowedFilter::scope('max_total_price'),
             ])
             ->paginate(request('per_page', 10))
             ->appends(request()->query());
