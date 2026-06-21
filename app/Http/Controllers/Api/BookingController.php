@@ -66,7 +66,7 @@ class BookingController extends Controller
             ->allowedSorts(
                 'id', 'customer_name', 'customer_email',
                 'start_datetime', 'end_datetime', 'duration_minutes',
-                'total_price', 'status'
+                'total_price', 'status', 'created_at'
             )
             ->allowedIncludes('service')
             ->allowedFilters([
