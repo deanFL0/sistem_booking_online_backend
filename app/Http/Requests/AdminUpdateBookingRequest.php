@@ -24,7 +24,7 @@ class AdminUpdateBookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'sometimes|exists:users,id',
+            'user_id' => 'nullable|exists:users,id',
             'service_id' => 'sometimes|exists:services,id',
             'customer_name' => 'sometimes|string|max:255',
             'customer_email' => 'sometimes|email|max:255',
