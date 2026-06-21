@@ -30,6 +30,10 @@ class BookingResource extends JsonResource
             'manage_token' => $this->manage_token,
             'has_conflict' => $this->has_conflict,
             'conflict_details' => $this->conflict_details,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+
+            'service' => new ServiceResource($this->whenLoaded('service')),
         ];
     }
 }
