@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 
 class Booking extends Model
@@ -93,6 +94,14 @@ class Booking extends Model
     public function resources(): BelongsToMany
     {
         return $this->belongsToMany(Resource::class);
+    }
+
+    public function getFormattedTotalPriceAttribute(): string
+    {
+        $total_price = $this->total_price;
+        $total_price = Number::currency($total_price, 'IDR', 'id', 0);
+        $total_price = $this->pricing_type === 'hourly' ? $total_price . '/jam' : $total_price;
+        return $total_price;
     }
 
     public function scopeMinStartDatetime($query, $minTime)
