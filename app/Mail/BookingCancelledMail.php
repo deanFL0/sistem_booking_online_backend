@@ -39,6 +39,9 @@ class BookingCancelledMail extends Mailable
     {
         return new Content(
             view: 'mails.booking-cancelled',
+            with: [
+            'frontendUrl' => config('app.frontend_url'),
+        ],
         );
     }
 

@@ -88,7 +88,7 @@
             
             <!-- Call-to-Action -->
             <center>
-                <a href="http://localhost:5173/services" class="button">
+                <a href="{{ $frontendUrl }}/services" class="button">
                     Book Another Appointment
                 </a>
             </center>

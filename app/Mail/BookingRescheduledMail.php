@@ -39,6 +39,9 @@ class BookingRescheduledMail extends Mailable
     {
         return new Content(
             view: 'mails.booking-rescheduled',
+            with: [
+            'frontendUrl' => config('app.frontend_url'),
+        ],
         );
     }
 

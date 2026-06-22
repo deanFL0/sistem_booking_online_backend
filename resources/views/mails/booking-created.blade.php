@@ -89,13 +89,13 @@
             <!-- Call-to-Action -->
             @if($booking->user_id)
             <center>
-                <a href="http://localhost:5173/my-bookings/{{ $booking->id }}" class="button">
+                <a href="{{ $frontendUrl }}/my-bookings/{{ $booking->id }}" class="button">
                     View or Manage Your Booking
                 </a>
             </center>
             @else
             <center>
-                <a href="http://localhost:5173/my-bookings/guest/{{ $booking->manage_token }}" class="button">
+                <a href="{{ $frontendUrl }}/my-bookings/guest/{{ $booking->manage_token }}" class="button">
                     View or Manage Your Booking
                 </a>
             </center>

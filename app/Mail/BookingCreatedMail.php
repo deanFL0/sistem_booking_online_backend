@@ -39,6 +39,9 @@ class BookingCreatedMail extends Mailable
     {
         return new Content(
             view: 'mails.booking-created',
+            with: [
+            'frontendUrl' => config('app.frontend_url'),
+        ],
         );
     }
 
