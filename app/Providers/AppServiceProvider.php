@@ -55,14 +55,14 @@ class AppServiceProvider extends ServiceProvider
 
             if ($request->user()) {
                 return [
-                    Limit::perMinute(3)->by($request->user()->id),
-                    Limit::perHour(10)->by($request->user()->id),
+                    Limit::perMinute(10)->by($request->user()->id),
+                    Limit::perHour(20)->by($request->user()->id),
                 ];
             }
 
             return [
-                Limit::perMinute(2)->by($request->ip()),
-                Limit::perHour(5)->by($request->ip()),
+                Limit::perMinute(5)->by($request->ip()),
+                Limit::perHour(10)->by($request->ip()),
             ];
         });
 
