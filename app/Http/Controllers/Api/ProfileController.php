@@ -15,12 +15,12 @@ class ProfileController extends Controller
     // show current user profile
     public function me()
     {
-        return new ProfileResource(auth()->user());
+        return new ProfileResource(auth('sanctum')->user());
     }
 
     public function update(UpdateProfileRequest $request)
     {
-        $user = auth()->user();
+        $user = auth('sanctum')->user();
         $user->update($request->validated());
 
         return new ProfileResource($user);
@@ -33,7 +33,7 @@ class ProfileController extends Controller
             'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 
-        $user = auth()->user();
+        $user = auth('sanctum')->user();
         $user->update([
             'password' => Hash::make($validated['password']),
         ]);
@@ -43,7 +43,7 @@ class ProfileController extends Controller
 
     public function destroy()
     {
-        $user = auth()->user();
+        $user = auth('sanctum')->user();
         $user->delete();
 
         // revoke all tokens
